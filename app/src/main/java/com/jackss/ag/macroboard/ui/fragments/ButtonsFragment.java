@@ -11,7 +11,9 @@ import android.view.ViewGroup;
 import com.jackss.ag.macroboard.R;
 
 /**
+ *  Fragment containing buttons and sections available to the user.
  *
+ *  Buttons can be configured in the settings.
  */
 
 public class ButtonsFragment extends Fragment
