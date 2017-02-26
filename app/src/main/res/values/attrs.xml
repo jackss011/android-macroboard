@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- TrackpadView -->
+    <declare-styleable name="TrackpadView" >
+        <attr name="baseColor" format="color"/>
+        <attr name="borderRadius" format="dimension"/>
+    </declare-styleable>
+
+</resources>
