@@ -11,8 +11,7 @@ import android.view.View;
 import com.jackss.ag.macroboard.R;
 
 /**
- * Created by Giacomo on 22/02/2017.
- *
+ *  A view used to simulate a laptop-like trackpad
  *
  */
 
