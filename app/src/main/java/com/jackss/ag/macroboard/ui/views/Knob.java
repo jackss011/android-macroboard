@@ -2,10 +2,9 @@ package com.jackss.ag.macroboard.ui.views;
 
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
+import android.graphics.*;
 import android.util.AttributeSet;
+import android.view.ViewOutlineProvider;
 import com.jackss.ag.macroboard.R;
 import android.view.View;
 
@@ -17,9 +16,8 @@ import android.view.View;
 public class Knob extends View
 {
     // Calculated variables
-    private float centerX;
-    private float centerY;
-    private float radius;
+    private RectF circleBounds = new RectF();
+    private RectF innerCircleBounds = new RectF();
     private float notchY;
     private float notchRadius;
 
@@ -36,7 +34,7 @@ public class Knob extends View
     private float notchDisplacement = 0.2f;
     private float notchSizePerc = 0.055f;
 
-
+    
     public Knob(Context context)
     {
         this(context, null);
@@ -45,6 +43,16 @@ public class Knob extends View
     public Knob(Context context, AttributeSet attrs)
     {
         super(context, attrs);
+
+        setOutlineProvider(new ViewOutlineProvider() {
+            @Override
+            public void getOutline(View view, Outline outline)
+            {
+                Rect r = new Rect();
+                circleBounds.roundOut(r);
+                outline.setOval(r);
+            }
+        });
 
         TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.Knob);
         try
@@ -69,7 +77,7 @@ public class Knob extends View
         circlePaint.setColor(circleColor);
 
         circleStrokePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        circleStrokePaint.setStyle(Paint.Style.STROKE);
+        circleStrokePaint.setStyle(Paint.Style.FILL);
         circleStrokePaint.setStrokeWidth(strokeWidth);
         circleStrokePaint.setColor(strokeColor);
 
@@ -83,16 +91,17 @@ public class Knob extends View
     {
         super.onSizeChanged(w, h, oldw, oldh);
 
-        int nopaddX = w - (getPaddingLeft() + getPaddingRight());
-        int nopaddY = h - (getPaddingTop() + getPaddingBottom());
+        circleBounds = new RectF(getPaddingLeft(), getPaddingTop(), w - getPaddingRight(), h - getPaddingBottom());
+        if(circleBounds.height() > circleBounds.width())
+            circleBounds.inset(0, (circleBounds.height() - circleBounds.width()) / 2);
+        else
+            circleBounds.inset((circleBounds.width() - circleBounds.height()) / 2, 0);
 
-        radius = Math.min(nopaddX, nopaddY) / 2 - strokeWidth / 2;
+        innerCircleBounds.set(circleBounds);
+        innerCircleBounds.inset(strokeWidth, strokeWidth);
 
-        centerX = getPaddingLeft() + nopaddX / 2;
-        centerY = getPaddingTop() + nopaddY / 2;
-
-        notchY = centerY - radius + radius * notchDisplacement;
-        notchRadius = radius * notchSizePerc;
+        notchY = innerCircleBounds.top + innerCircleBounds.height() * notchDisplacement / 2;
+        notchRadius = innerCircleBounds.height() * notchSizePerc / 2;
     }
 
     @Override
@@ -100,12 +109,12 @@ public class Knob extends View
     {
         super.onDraw(canvas);
 
-        canvas.drawCircle(centerX, centerY, radius, circlePaint);
-        canvas.drawCircle(centerX, centerY, radius, circleStrokePaint);
+        canvas.drawOval(circleBounds, circleStrokePaint);
+        canvas.drawOval(innerCircleBounds, circlePaint);
 
         canvas.save();
-        canvas.rotate(getAngle(), centerX, centerY);
-        canvas.drawCircle(centerX, notchY, notchRadius, notchPaint);
+        canvas.rotate(getAngle(), circleBounds.centerX(), circleBounds.centerY());
+        canvas.drawCircle(circleBounds.centerX(), notchY, notchRadius, notchPaint);
         canvas.restore();
     }
 
