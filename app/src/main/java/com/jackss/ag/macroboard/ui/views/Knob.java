@@ -34,7 +34,7 @@ public class Knob extends View
     private float notchDisplacement = 0.2f;
     private float notchSizePerc = 0.055f;
 
-    
+
     public Knob(Context context)
     {
         this(context, null);
@@ -109,7 +109,7 @@ public class Knob extends View
     {
         super.onDraw(canvas);
 
-        canvas.drawOval(circleBounds, circleStrokePaint);
+        if(strokeWidth > 0.5f) canvas.drawOval(circleBounds, circleStrokePaint);
         canvas.drawOval(innerCircleBounds, circlePaint);
 
         canvas.save();
