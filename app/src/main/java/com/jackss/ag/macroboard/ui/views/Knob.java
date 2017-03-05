@@ -6,7 +6,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.AttributeSet;
-import android.util.Log;
+import com.jackss.ag.macroboard.R;
 import android.view.View;
 
 /**
@@ -29,7 +29,7 @@ public class Knob extends View
     private Paint notchPaint;
 
     // Attributes
-    private int baseColor = Color.GRAY;
+    private int circleColor = Color.GRAY;
     private int strokeColor = Color.DKGRAY;
     private float strokeWidth = 4.f;
     private int notchColor = Color.DKGRAY;
@@ -46,6 +46,18 @@ public class Knob extends View
     {
         super(context, attrs);
 
+        TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.Knob);
+        try
+        {
+            circleColor = a.getColor(R.styleable.Knob_circleColor, circleColor);
+            strokeColor = a.getColor(R.styleable.Knob_strokeColor, strokeColor);
+            strokeWidth = a.getDimension(R.styleable.Knob_strokeWidth, strokeWidth);
+            notchColor = a.getColor(R.styleable.Knob_notchColor, notchColor);
+            notchDisplacement = a.getFloat(R.styleable.Knob_notchDisplacement, notchDisplacement);
+            notchSizePerc = a.getFloat(R.styleable.Knob_notchSizePerc, notchSizePerc);
+        }
+        finally { a.recycle(); }
+
         initGraphics();
     }
 
@@ -54,7 +66,7 @@ public class Knob extends View
     {
         circlePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         circlePaint.setStyle(Paint.Style.FILL);
-        circlePaint.setColor(baseColor);
+        circlePaint.setColor(circleColor);
 
         circleStrokePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         circleStrokePaint.setStyle(Paint.Style.STROKE);

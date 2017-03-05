@@ -7,4 +7,14 @@
         <attr name="borderRadius" format="dimension"/>
     </declare-styleable>
 
+    <!-- Knob -->
+    <declare-styleable name="Knob" >
+        <attr name="circleColor" format="color"/>
+        <attr name="strokeColor" format="color"/>
+        <attr name="strokeWidth" format="dimension"/>
+        <attr name="notchColor" format="color"/>
+        <attr name="notchDisplacement" format="float"/>
+        <attr name="notchSizePerc" format="float"/>
+    </declare-styleable>
+
 </resources>
