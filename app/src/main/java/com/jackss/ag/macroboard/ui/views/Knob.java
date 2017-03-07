@@ -4,9 +4,9 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.*;
 import android.util.AttributeSet;
+import android.view.View;
 import android.view.ViewOutlineProvider;
 import com.jackss.ag.macroboard.R;
-import android.view.View;
 
 /**
  *  A view which represents a knob
@@ -33,6 +33,9 @@ public class Knob extends View
     private int notchColor = Color.DKGRAY;
     private float notchDisplacement = 0.2f;
     private float notchSizePerc = 0.055f;
+
+    // Position
+    private float position = 0.f;
 
 
     public Knob(Context context)
@@ -113,13 +116,39 @@ public class Knob extends View
         canvas.drawOval(innerCircleBounds, circlePaint);
 
         canvas.save();
-        canvas.rotate(getAngle(), circleBounds.centerX(), circleBounds.centerY());
+        canvas.rotate(getPositionDegrees(), circleBounds.centerX(), circleBounds.centerY());
         canvas.drawCircle(circleBounds.centerX(), notchY, notchRadius, notchPaint);
         canvas.restore();
     }
 
-    public float getAngle()
+    /** Get current position converted to degrees from 0 to 360 */
+    public float getPositionDegrees()
     {
-        return 0;
+        return 360 * getPosition();
+    }
+
+    /** Position goes from 0 to 1.  */
+    public float getPosition()
+    {
+        return position;
+    }
+
+    /** Teleport knob to the given position */
+    public void setPosition(float newPos)
+    {
+        float modPos = newPos % 1;
+
+        // if new position is negative, use the corresponding positive value instead
+        // ex. -0.3 becomes 1 - 0.3 = 0.7
+        if(modPos < 0) modPos = 1 + modPos;
+
+        position = modPos;
+        invalidate();
+    }
+
+    /** Teleport knob to current position + delta position */
+    public void movePosition(float deltaPos)
+    {
+        setPosition(getPosition() + deltaPos);
     }
 }
