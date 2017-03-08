@@ -49,6 +49,9 @@ public class Knob extends View
     // Listener
     private OnKnobEventListener eventListener;
 
+    // Used in onTouchEvent to cache the last touched Y
+    float lastTouchY = 0.f;
+
 
     /** Listener for knob events. Can be set by using setOnKnobEventListener(l). */
     public interface OnKnobEventListener
@@ -161,11 +164,32 @@ public class Knob extends View
     @Override
     public boolean onTouchEvent(MotionEvent event)
     {
+        int action = event.getActionMasked();
+        int primaryIndex = event.findPointerIndex(0);
+
+        switch(action)
+        {
+            case MotionEvent.ACTION_DOWN:
+                if(primaryIndex == -1) throw new AssertionError("Can't find pointer with id 0 on ACTION_DOWN");
+                lastTouchY = event.getY(primaryIndex);
+                break;
+
+            case MotionEvent.ACTION_MOVE:
+                if(primaryIndex != -1)
+                {
+                    float touchY = event.getY(primaryIndex);
+                    final float delta = (touchY - lastTouchY) / 1000;
+                    lastTouchY = touchY;
+                    movePosition(delta);
+                }
+                break;
+        }
+
         return true;
     }
 
     /** Set the event listener for this knob */
-    public void setOnKnobChangeListener(OnKnobEventListener listener)
+    public void setOnKnobEventListener(OnKnobEventListener listener)
     {
         eventListener = listener;
     }
