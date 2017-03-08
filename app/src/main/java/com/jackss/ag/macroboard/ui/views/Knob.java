@@ -178,7 +178,7 @@ public class Knob extends View
                 if(primaryIndex != -1)
                 {
                     float touchY = event.getY(primaryIndex);
-                    final float delta = (touchY - lastTouchY) / 1000;
+                    final float delta = (touchY - lastTouchY) / 1000 * -1;
                     lastTouchY = touchY;
                     movePosition(delta);
                 }
