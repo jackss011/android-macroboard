@@ -1,11 +1,13 @@
 package com.jackss.ag.macroboard.ui.views;
 
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.*;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewOutlineProvider;
+import android.view.animation.AccelerateDecelerateInterpolator;
 import com.jackss.ag.macroboard.R;
 
 /**
@@ -15,6 +17,9 @@ import com.jackss.ag.macroboard.R;
 
 public class Knob extends View
 {
+    // Constants
+    final private static int DEF_POSITION_ANIM_DURATION = 300;
+
     // Calculated variables
     private RectF circleBounds = new RectF();
     private RectF innerCircleBounds = new RectF();
@@ -36,6 +41,9 @@ public class Knob extends View
 
     // Position
     private float position = 0.f;
+
+    // Animation
+    private ValueAnimator positionMoveAnimator;
 
 
     public Knob(Context context)
@@ -70,6 +78,7 @@ public class Knob extends View
         finally { a.recycle(); }
 
         initGraphics();
+        initAnimations();
     }
 
 
@@ -87,6 +96,21 @@ public class Knob extends View
         notchPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         notchPaint.setStyle(Paint.Style.FILL);
         notchPaint.setColor(notchColor);
+    }
+
+    private void initAnimations()
+    {
+        positionMoveAnimator = ValueAnimator.ofFloat();
+        positionMoveAnimator.setDuration(DEF_POSITION_ANIM_DURATION);
+        positionMoveAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
+        positionMoveAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener()
+        {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation)
+            {
+                setPosition((Float) animation.getAnimatedValue());
+            }
+        });
     }
 
     @Override
@@ -127,10 +151,32 @@ public class Knob extends View
         return 360 * getPosition();
     }
 
-    /** Position goes from 0 to 1.  */
+    /** Position goes from 0 to 1 (1 excluded).
+     *  i.e. 0 corresponds to the top, 0.5 to the bottom.
+     *  Position is always mapped in this range. */
     public float getPosition()
     {
         return position;
+    }
+
+    /** Get a position which can be out of the normal range, that can be used in
+     *  animations to travel the shortest path from current position to desired
+     *  position {@code travelPos} */
+    public float getShortestPositionTravel(float travelPos)
+    {
+        final float dist = Math.abs(travelPos - getPosition());
+        if(dist > 0.5f) travelPos = getInvertedPosition(travelPos);
+
+        return travelPos;
+    }
+
+    /** Get a position matching the first one, but of the opposite sign.
+     *  ex. 0.2 becomes -0.8, -0.4 becomes 0.6 */
+    public float getInvertedPosition(float pos)
+    {
+        if(pos > 0.f) return pos - 1.f;
+        if(pos < 0.f) return pos + 1.f;
+        return 0.f;
     }
 
     /** Teleport knob to the given position */
@@ -138,8 +184,8 @@ public class Knob extends View
     {
         float modPos = newPos % 1;
 
-        // if new position is negative, use the corresponding positive value instead
-        // ex. -0.3 becomes 1 - 0.3 = 0.7
+        // if module is negative, use the corresponding positive value instead
+        // ex. -0.3 becomes -0.3 + 1 = 0.7
         if(modPos < 0) modPos = 1 + modPos;
 
         position = modPos;
@@ -150,5 +196,11 @@ public class Knob extends View
     public void movePosition(float deltaPos)
     {
         setPosition(getPosition() + deltaPos);
+    }
+
+    public void animatePositionTo(float newPosition)
+    {
+        positionMoveAnimator.setFloatValues(getPosition(), getShortestPositionTravel(newPosition));
+        positionMoveAnimator.start();
     }
 }
