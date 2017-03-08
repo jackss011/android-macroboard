@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.*;
 import android.util.AttributeSet;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewOutlineProvider;
 import android.view.animation.AccelerateDecelerateInterpolator;
@@ -44,6 +45,18 @@ public class Knob extends View
 
     // Animation
     private ValueAnimator positionMoveAnimator;
+
+    // Listener
+    private OnKnobEventListener eventListener;
+
+
+    /** Listener for knob events. Can be set by using setOnKnobEventListener(l). */
+    public interface OnKnobEventListener
+    {
+        /** Called when a knob change its position by using movePosition(pos).
+         *  Normally used when user change its position through touch events*/
+        void onKnobMove(Knob knob, float delta);
+    }
 
 
     public Knob(Context context)
@@ -145,6 +158,18 @@ public class Knob extends View
         canvas.restore();
     }
 
+    @Override
+    public boolean onTouchEvent(MotionEvent event)
+    {
+        return true;
+    }
+
+    /** Set the event listener for this knob */
+    public void setOnKnobChangeListener(OnKnobEventListener listener)
+    {
+        eventListener = listener;
+    }
+
     /** Get current position converted to degrees from 0 to 360 */
     public float getPositionDegrees()
     {
@@ -196,6 +221,8 @@ public class Knob extends View
     public void movePosition(float deltaPos)
     {
         setPosition(getPosition() + deltaPos);
+
+        if(eventListener != null) eventListener.onKnobMove(this, deltaPos);
     }
 
     public void animatePositionTo(float newPosition)
