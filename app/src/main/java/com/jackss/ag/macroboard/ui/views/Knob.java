@@ -12,8 +12,8 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 import com.jackss.ag.macroboard.R;
 
 /**
- *  A view which represents a knob
- *
+ *  Knob that can be rotated by the user. Event callbacks are defined in Knob.OnKnobEventListener.
+ *  Currently, it can only rotate indefinitely and its unique callback report a delta movement.
  */
 
 public class Knob extends View
