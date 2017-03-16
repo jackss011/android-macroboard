@@ -78,7 +78,7 @@ public class BottomNavigation extends FrameLayout implements ValueAnimator.Anima
         highlightPaint.setColor(highlightColor);
         highlightPaint.setStyle(Paint.Style.FILL);
 
-        setBackgroundColor(backgroundColor);
+        setBackgroundColor(backgroundColor); //TODO remove this statement
     }
 
     private void initAnimations()
@@ -118,7 +118,7 @@ public class BottomNavigation extends FrameLayout implements ValueAnimator.Anima
         return new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT, 1);
     }
 
-    private View createTestView(Context context)
+    private View createTestView(Context context) //TODO remove this function
     {
         BottomNavigationItem v = new BottomNavigationItem(context);
 
