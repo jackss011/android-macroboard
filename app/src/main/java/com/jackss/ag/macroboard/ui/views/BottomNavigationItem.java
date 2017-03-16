@@ -11,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import com.jackss.ag.macroboard.R;
+import com.jackss.ag.macroboard.utils.MBUtils;
 
 /**
  *  Item displayed in BottomNavigation
@@ -45,7 +46,7 @@ public class BottomNavigationItem extends FrameLayout
     {
         layout = new LinearLayout(context);
         layout.setOrientation(LinearLayout.VERTICAL);
-        layout.setPadding(0, dpToPx(6), 0, dpToPx(10));
+        layout.setPadding(0, MBUtils.dp2px(6), 0, MBUtils.dp2px(10));
 
         icon = new ImageView(context);
         icon.setImageResource(R.mipmap.ic_launcher);
@@ -56,20 +57,9 @@ public class BottomNavigationItem extends FrameLayout
         label.setTextAlignment(TEXT_ALIGNMENT_CENTER);
         label.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
 
-        layout.addView(icon, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dpToPx(24)));
+        layout.addView(icon, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, MBUtils.dp2px(24)));
         layout.addView(label, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
 
         addView(layout, new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-    }
-
-    static int dpToPx(int dp)
-    {
-        int px = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, Resources.getSystem().getDisplayMetrics());
-        return px;
-    }
-    
-    public static int spToPx(float sp, Context context)
-    {
-        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, sp,  Resources.getSystem().getDisplayMetrics());
     }
 }
