@@ -23,21 +23,21 @@ import java.util.ArrayList;
 
 public class BottomNavigation extends FrameLayout implements ValueAnimator.AnimatorUpdateListener
 {
-    private static final int HIGHLIGHT_ANIM_DURATION = 200;
+    private static final int CURSOR_ANIM_DURATION = 200;
 
     LinearLayout layout;
     
-    private float highlightLeft = 0;
-    private float highlightRight = 0;
+    private float cursorLeft = 0.f;
+    private float cursorRight = 0.f;
     
-    private int highlightHeight = 12;
-    private int highlightColor = Color.RED;
+    private int cursorHeight = 12;
+    private int cursorColor = Color.RED;
     private int backgroundColor = Color.CYAN;
 
-    private Paint highlightPaint;
+    private Paint cursorPaint;
 
-    private ValueAnimator rightHlAnimator;
-    private ValueAnimator leftHlAnimator;
+    private ValueAnimator rightCursorAnimator;
+    private ValueAnimator leftCursorAnimator;
 
     public BottomNavigation(Context context)
     {
@@ -58,12 +58,11 @@ public class BottomNavigation extends FrameLayout implements ValueAnimator.Anima
     {
         super(context, attrs, defStyleAttr, defStyleRes);
 
-        setPadding(0, 0, 0, highlightHeight);
+        setPadding(0, 0, 0, cursorHeight);
 
         layout = new LinearLayout(context);
         layout.setOrientation(LinearLayout.HORIZONTAL);
         addView(layout, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-
 
         for(int i = 0; i < 5; ++i) layout.addView(createTestView(context), generateNavItemLayoutParams());
 
@@ -74,25 +73,25 @@ public class BottomNavigation extends FrameLayout implements ValueAnimator.Anima
     
     private void initGraphics()
     {
-        highlightPaint = new Paint();
-        highlightPaint.setColor(highlightColor);
-        highlightPaint.setStyle(Paint.Style.FILL);
+        cursorPaint = new Paint();
+        cursorPaint.setColor(cursorColor);
+        cursorPaint.setStyle(Paint.Style.FILL);
 
         setBackgroundColor(backgroundColor); //TODO remove this statement
     }
 
     private void initAnimations()
     {
-        rightHlAnimator = ValueAnimator.ofFloat();
-        setupHlAnimator(rightHlAnimator);
+        rightCursorAnimator = ValueAnimator.ofFloat();
+        setupCursorAnimator(rightCursorAnimator);
 
-        leftHlAnimator = ValueAnimator.ofFloat();
-        setupHlAnimator(leftHlAnimator);
+        leftCursorAnimator = ValueAnimator.ofFloat();
+        setupCursorAnimator(leftCursorAnimator);
     }
 
-    protected void setupHlAnimator(ValueAnimator animator)
+    protected void setupCursorAnimator(ValueAnimator animator)
     {
-        animator.setDuration(HIGHLIGHT_ANIM_DURATION);
+        animator.setDuration(CURSOR_ANIM_DURATION);
         animator.setInterpolator(new AccelerateDecelerateInterpolator());
         animator.addUpdateListener(this);
     }
@@ -110,7 +109,7 @@ public class BottomNavigation extends FrameLayout implements ValueAnimator.Anima
     {
         super.onDraw(canvas);
         
-        canvas.drawRect(highlightLeft, getHeight() - highlightHeight, highlightRight, (float) getHeight(), highlightPaint);
+        canvas.drawRect(cursorLeft, getHeight() - cursorHeight, cursorRight, (float) getHeight(), cursorPaint);
     }
 
     private ViewGroup.LayoutParams generateNavItemLayoutParams()
@@ -125,39 +124,39 @@ public class BottomNavigation extends FrameLayout implements ValueAnimator.Anima
         return v;
     }
 
-    private void setHighlightChild(int pos)
+    private void setCursorToChild(int pos)
     {
         View child = layout.getChildAt(pos);
         if(child != null)
         {
-            leftHlAnimator.cancel();
-            rightHlAnimator.cancel();
+            leftCursorAnimator.cancel();
+            rightCursorAnimator.cancel();
 
-            highlightLeft = child.getLeft();
-            highlightRight = child.getRight();
+            cursorLeft = child.getLeft();
+            cursorRight = child.getRight();
         }
 
         invalidate();
     }
 
-    public void moveHighlightToChild(int pos) //TODO should be private
+    public void moveCursorToChild(int pos) //TODO should be private
     {
         View child = layout.getChildAt(pos);
         if(child != null)
         {
-            leftHlAnimator.setFloatValues(highlightLeft, child.getLeft());
-            leftHlAnimator.start();
+            leftCursorAnimator.setFloatValues(cursorLeft, child.getLeft());
+            leftCursorAnimator.start();
 
-            rightHlAnimator.setFloatValues(highlightRight, child.getRight());
-            rightHlAnimator.start();
+            rightCursorAnimator.setFloatValues(cursorRight, child.getRight());
+            rightCursorAnimator.start();
         }
     }
 
     @Override
     public void onAnimationUpdate(ValueAnimator animator)
     {
-        if(animator.equals(leftHlAnimator)) highlightLeft = (float) animator.getAnimatedValue();
-        else if(animator.equals(rightHlAnimator)) highlightRight = (float) animator.getAnimatedValue();
+        if(animator.equals(leftCursorAnimator)) cursorLeft = (float) animator.getAnimatedValue();
+        else if(animator.equals(rightCursorAnimator)) cursorRight = (float) animator.getAnimatedValue();
 
         invalidate();
     }
