@@ -1,11 +1,12 @@
 package com.jackss.ag.macroboard.ui.views;
 
 import android.content.Context;
+import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
+import android.support.annotation.DrawableRes;
+import android.support.annotation.StringRes;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.GestureDetector;
 import android.view.Gravity;
@@ -15,9 +16,8 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.support.annotation.DrawableRes;
-import android.support.annotation.StringRes;
 import com.jackss.ag.macroboard.R;
+import com.jackss.ag.macroboard.utils.BubbleGenerator;
 import com.jackss.ag.macroboard.utils.MBUtils;
 
 
@@ -32,6 +32,7 @@ public class BottomNavigationItem extends FrameLayout
     private ImageView icon;
     private TextView label;
 
+    private BubbleGenerator bubbleGenerator;
     private GestureDetector detector;
 
     private GestureDetector.OnGestureListener gestureListener = new GestureDetector.SimpleOnGestureListener()
@@ -39,8 +40,8 @@ public class BottomNavigationItem extends FrameLayout
         @Override
         public boolean onSingleTapUp(MotionEvent e)
         {
-            Log.v("Test", "Tap:" + e.getX() + " - " + e.getY());
-            return true;
+            if(bubbleGenerator != null) bubbleGenerator.generateBubble(e.getX(), e.getY());
+            return false;
         }
     };
 
@@ -59,12 +60,38 @@ public class BottomNavigationItem extends FrameLayout
     {
         super(context, attrs);
 
+        bubbleGenerator = new BubbleGenerator(this);
         detector = new GestureDetector(context, gestureListener);
+
         setSoundEffectsEnabled(false);
 
         buildUI(context);
     }
 
+
+    @Override
+    protected void onLayout(boolean changed, int left, int top, int right, int bottom)
+    {
+        super.onLayout(changed, left, top, right, bottom);
+
+        setWillNotDraw(false);
+    }
+
+    @Override
+    protected void onSizeChanged(int w, int h, int oldw, int oldh)
+    {
+        super.onSizeChanged(w, h, oldw, oldh);
+
+        if(bubbleGenerator != null) bubbleGenerator.determinateMaxRadius();
+    }
+
+    @Override
+    protected void onDraw(Canvas canvas)
+    {
+        super.onDraw(canvas);
+
+        bubbleGenerator.draw(canvas);
+    }
 
     @Override
     public boolean onTouchEvent(MotionEvent event)
