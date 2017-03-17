@@ -5,8 +5,11 @@ import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.util.TypedValue;
+import android.view.GestureDetector;
 import android.view.Gravity;
+import android.view.MotionEvent;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -29,12 +32,20 @@ public class BottomNavigationItem extends FrameLayout
     private ImageView icon;
     private TextView label;
 
+    private GestureDetector detector;
+
+    private GestureDetector.OnGestureListener gestureListener = new GestureDetector.SimpleOnGestureListener()
+    {
+        @Override
+        public boolean onSingleTapUp(MotionEvent e)
+        {
+            Log.v("Test", "Tap:" + e.getX() + " - " + e.getY());
+            return true;
+        }
+    };
+
     private int selectedColor = Color.BLUE;
     private int defaultColor = Color.GRAY;
-
-    private int PADDING_BOTTOM = 10;
-    private int PADDING_TOP = 6;
-    private int ICON_SIZE = 24;
 
     private boolean isCollapsed = false;
 
@@ -48,9 +59,20 @@ public class BottomNavigationItem extends FrameLayout
     {
         super(context, attrs);
 
+        detector = new GestureDetector(context, gestureListener);
+        setSoundEffectsEnabled(false);
+
         buildUI(context);
     }
 
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event)
+    {
+        detector.onTouchEvent(event);
+
+        return super.onTouchEvent(event);
+    }
 
     private void buildUI(Context context)
     {
