@@ -164,4 +164,14 @@ public class BubbleGenerator implements ValueAnimator.AnimatorUpdateListener
 
         if(bubblePaint != null) bubblePaint.setColor(this.bubbleColor);
     }
+
+    /** Set maximum radius based on parent dimensions. Should be called after every resize (i.e View.onSizeChanged(...)) */
+    public void determinateMaxRadius()
+    {
+        if(parent != null)
+        {
+            final float diagonal = (float) Math.sqrt(Math.pow(parent.getWidth(), 2.f) + Math.pow(parent.getHeight(), 2.f)) / 2;
+            setMaxRadius(1.3f * diagonal); // slightly increase diagonal radius
+        }
+    }
 }
