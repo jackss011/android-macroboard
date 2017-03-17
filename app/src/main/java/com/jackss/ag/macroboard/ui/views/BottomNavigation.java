@@ -40,6 +40,12 @@ public class BottomNavigation extends FrameLayout implements ValueAnimator.Anima
     private ValueAnimator rightCursorAnimator;
     private ValueAnimator leftCursorAnimator;
 
+    private OnSelectionListener selectionListener;
+
+
+    public interface OnSelectionListener { void onSelection(int pos, BottomNavigationItem item); }
+
+
     public BottomNavigation(Context context)
     {
         this(context, null);
@@ -192,7 +198,10 @@ public class BottomNavigation extends FrameLayout implements ValueAnimator.Anima
      * */
     public void selectItem(int pos, boolean animate)
     {
-        if(layout.getChildAt(pos) == null) return;
+        if(layout.getChildAt(pos) == null)
+        {
+            return;
+        }
 
         for (int i = 0; i < layout.getChildCount(); ++i)
         {
@@ -203,6 +212,10 @@ public class BottomNavigation extends FrameLayout implements ValueAnimator.Anima
             {
                 child.setSelected(true);
 
+                // notify selection
+                if(selectionListener != null) selectionListener.onSelection(pos, child);
+
+                // should play animations
                 if(animate)
                     moveCursorToChild(i);
                 else
@@ -210,5 +223,10 @@ public class BottomNavigation extends FrameLayout implements ValueAnimator.Anima
             }
             else child.setSelected(false);
         }
+    }
+
+    public void setOnSelectionListener(OnSelectionListener selectionListener)
+    {
+        this.selectionListener = selectionListener;
     }
 }
