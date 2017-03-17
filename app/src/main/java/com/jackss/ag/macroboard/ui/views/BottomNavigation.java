@@ -4,12 +4,14 @@ import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Outline;
 import android.graphics.Paint;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewAnimationUtils;
 import android.view.ViewGroup;
+import android.view.ViewOutlineProvider;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
@@ -21,7 +23,7 @@ import java.util.ArrayList;
  *
  */
 
-public class BottomNavigation extends FrameLayout implements ValueAnimator.AnimatorUpdateListener
+public class BottomNavigation extends FrameLayout implements ValueAnimator.AnimatorUpdateListener, View.OnClickListener
 {
     private static final int CURSOR_ANIM_DURATION = 200;
 
@@ -32,7 +34,6 @@ public class BottomNavigation extends FrameLayout implements ValueAnimator.Anima
     
     private int cursorHeight = 12;
     private int cursorColor = Color.RED;
-    private int backgroundColor = Color.CYAN;
 
     private Paint cursorPaint;
 
@@ -58,16 +59,25 @@ public class BottomNavigation extends FrameLayout implements ValueAnimator.Anima
     {
         super(context, attrs, defStyleAttr, defStyleRes);
 
+        setOutlineProvider(new ViewOutlineProvider()
+        {
+            @Override
+            public void getOutline(View view, Outline outline)
+            {
+                outline.setRect(0, 0, getWidth(), getHeight());
+            }
+        });
+
         setPadding(0, 0, 0, cursorHeight);
 
         layout = new LinearLayout(context);
         layout.setOrientation(LinearLayout.HORIZONTAL);
         addView(layout, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
 
-        for(int i = 0; i < 5; ++i) layout.addView(createTestView(context), generateNavItemLayoutParams());
-
         initGraphics();
         initAnimations();
+
+        buildChildren();
     }
     
     
@@ -76,8 +86,6 @@ public class BottomNavigation extends FrameLayout implements ValueAnimator.Anima
         cursorPaint = new Paint();
         cursorPaint.setColor(cursorColor);
         cursorPaint.setStyle(Paint.Style.FILL);
-
-        setBackgroundColor(backgroundColor); //TODO remove this statement
     }
 
     private void initAnimations()
@@ -87,6 +95,11 @@ public class BottomNavigation extends FrameLayout implements ValueAnimator.Anima
 
         leftCursorAnimator = ValueAnimator.ofFloat();
         setupCursorAnimator(leftCursorAnimator);
+    }
+
+    private void buildChildren()
+    {
+        for(int i = 0; i < 5; ++i) layout.addView(createTestView(getContext()), generateNavItemLayoutParams());
     }
 
     protected void setupCursorAnimator(ValueAnimator animator)
@@ -102,6 +115,7 @@ public class BottomNavigation extends FrameLayout implements ValueAnimator.Anima
         super.onLayout(changed, left, top, right, bottom);
         
         setWillNotDraw(false);
+        selectItem(0, false);
     }
 
     @Override
@@ -120,7 +134,7 @@ public class BottomNavigation extends FrameLayout implements ValueAnimator.Anima
     private View createTestView(Context context) //TODO remove this function
     {
         BottomNavigationItem v = new BottomNavigationItem(context);
-
+        v.setOnClickListener(this);
         return v;
     }
 
@@ -139,7 +153,7 @@ public class BottomNavigation extends FrameLayout implements ValueAnimator.Anima
         invalidate();
     }
 
-    public void moveCursorToChild(int pos) //TODO should be private
+    private void moveCursorToChild(int pos)
     {
         View child = layout.getChildAt(pos);
         if(child != null)
@@ -159,5 +173,38 @@ public class BottomNavigation extends FrameLayout implements ValueAnimator.Anima
         else if(animator.equals(rightCursorAnimator)) cursorRight = (float) animator.getAnimatedValue();
 
         invalidate();
+    }
+
+    @Override
+    public void onClick(View v)
+    {
+        final int index = layout.indexOfChild(v);
+        if(index != -1) selectItem(index, true);
+    }
+
+    /** Select the item at the given position and call BottomViewSelectListener callback.
+     * @param pos The position of the item
+     * @param animate If should play cursor animations or not
+     * */
+    public void selectItem(int pos, boolean animate)
+    {
+        if(layout.getChildAt(pos) == null) return;
+
+        for (int i = 0; i < layout.getChildCount(); ++i)
+        {
+            BottomNavigationItem child = (BottomNavigationItem) layout.getChildAt(i);
+            if(child == null) continue;
+
+            if(pos == i)
+            {
+                child.setSelected(true);
+
+                if(animate)
+                    moveCursorToChild(i);
+                else
+                    setCursorToChild(i);
+            }
+            else child.setSelected(false);
+        }
     }
 }

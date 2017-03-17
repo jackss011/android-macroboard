@@ -1,6 +1,8 @@
 package com.jackss.ag.macroboard.ui.views;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.util.TypedValue;
@@ -26,6 +28,9 @@ public class BottomNavigationItem extends FrameLayout
     private LinearLayout layout;
     private ImageView icon;
     private TextView label;
+
+    private int selectedColor = Color.BLUE;
+    private int defaultColor = Color.GRAY;
 
     private int PADDING_BOTTOM = 10;
     private int PADDING_TOP = 6;
@@ -107,5 +112,20 @@ public class BottomNavigationItem extends FrameLayout
 
         if(isCollapsed) label.setVisibility(GONE);
         else label.setVisibility(VISIBLE);
+    }
+
+    @Override
+    public void setSelected(boolean selected)
+    {
+        super.setSelected(selected);
+
+        icon.setColorFilter(getCurrentColor());
+        label.setTextColor(getCurrentColor());
+    }
+
+    public int getCurrentColor()
+    {
+        if(isSelected()) return selectedColor;
+        else return defaultColor;
     }
 }
