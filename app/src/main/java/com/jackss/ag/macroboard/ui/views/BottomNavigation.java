@@ -59,21 +59,13 @@ public class BottomNavigation extends FrameLayout implements ValueAnimator.Anima
     {
         super(context, attrs, defStyleAttr, defStyleRes);
 
-        setOutlineProvider(new ViewOutlineProvider()
-        {
-            @Override
-            public void getOutline(View view, Outline outline)
-            {
-                outline.setRect(0, 0, getWidth(), getHeight());
-            }
-        });
-
         setPadding(0, 0, 0, cursorHeight);
 
         layout = new LinearLayout(context);
         layout.setOrientation(LinearLayout.HORIZONTAL);
         addView(layout, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
 
+        initOutline();
         initGraphics();
         initAnimations();
 
@@ -95,6 +87,18 @@ public class BottomNavigation extends FrameLayout implements ValueAnimator.Anima
 
         leftCursorAnimator = ValueAnimator.ofFloat();
         setupCursorAnimator(leftCursorAnimator);
+    }
+
+    private void initOutline()
+    {
+        setOutlineProvider(new ViewOutlineProvider()
+        {
+            @Override
+            public void getOutline(View view, Outline outline)
+            {
+                outline.setRect(0, 0, getWidth(), getHeight());
+            }
+        });
     }
 
     private void buildChildren()
