@@ -2,6 +2,7 @@ package com.jackss.ag.macroboard.ui.views;
 
 import android.animation.ValueAnimator;
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Outline;
@@ -9,14 +10,12 @@ import android.graphics.Paint;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.View;
-import android.view.ViewAnimationUtils;
 import android.view.ViewGroup;
 import android.view.ViewOutlineProvider;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
-
-import java.util.ArrayList;
+import com.jackss.ag.macroboard.R;
 
 /**
  *  Bottom navigation used to switch between categories
@@ -25,15 +24,18 @@ import java.util.ArrayList;
 
 public class BottomNavigation extends FrameLayout implements ValueAnimator.AnimatorUpdateListener, View.OnClickListener
 {
-    private static final int CURSOR_ANIM_DURATION = 200;
-
     LinearLayout layout;
     
     private float cursorLeft = 0.f;
     private float cursorRight = 0.f;
     
-    private int cursorHeight = 12;
+    // Attributes
+    private int defaultItemColor = Color.GRAY;
+    private int selectedItemColor = Color.BLUE;
     private int cursorColor = Color.RED;
+    private boolean condensed = false;
+    private int cursorAnimDuration = 200;
+    private int cursorHeight = 12;
 
     private Paint cursorPaint;
 
@@ -64,6 +66,19 @@ public class BottomNavigation extends FrameLayout implements ValueAnimator.Anima
     public BottomNavigation(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes)
     {
         super(context, attrs, defStyleAttr, defStyleRes);
+
+        TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.BottomNavigation, defStyleAttr, defStyleRes);
+        try
+        {
+            defaultItemColor = a.getColor(R.styleable.BottomNavigation_defaultItemColor, defaultItemColor);
+            selectedItemColor = a.getColor(R.styleable.BottomNavigation_selectedItemColor, selectedItemColor);
+            condensed = a.getBoolean(R.styleable.BottomNavigation_condensed, condensed);
+
+            cursorColor = a.getColor(R.styleable.BottomNavigation_cursorColor, selectedItemColor);
+            cursorAnimDuration = a.getInt(R.styleable.BottomNavigation_cursorAnimDuration, cursorAnimDuration);
+            cursorHeight = (int) a.getDimension(R.styleable.BottomNavigation_cursorHeight, cursorHeight);
+        }
+        finally { a.recycle(); }
 
         setPadding(0, 0, 0, cursorHeight);
 
@@ -107,16 +122,36 @@ public class BottomNavigation extends FrameLayout implements ValueAnimator.Anima
         });
     }
 
+    protected void setupItem(BottomNavigationItem item)
+    {
+        item.setDefaultColor(defaultItemColor);
+        item.setSelectedColor(selectedItemColor);
+        item.setCollapsed(condensed);
+    }
+
+    protected void setupCursorAnimator(ValueAnimator animator)
+    {
+        animator.setDuration(cursorAnimDuration);
+        animator.setInterpolator(new AccelerateDecelerateInterpolator());
+        animator.addUpdateListener(this);
+    }
+
     private void buildChildren()
     {
         for(int i = 0; i < 5; ++i) layout.addView(createTestView(getContext()), generateNavItemLayoutParams());
     }
 
-    protected void setupCursorAnimator(ValueAnimator animator)
+    private ViewGroup.LayoutParams generateNavItemLayoutParams()
     {
-        animator.setDuration(CURSOR_ANIM_DURATION);
-        animator.setInterpolator(new AccelerateDecelerateInterpolator());
-        animator.addUpdateListener(this);
+        return new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT, 1);
+    }
+
+    private View createTestView(Context context) //TODO remove this function
+    {
+        BottomNavigationItem v = new BottomNavigationItem(context);
+        v.setOnClickListener(this);
+        setupItem(v);
+        return v;
     }
 
     @Override
@@ -134,18 +169,6 @@ public class BottomNavigation extends FrameLayout implements ValueAnimator.Anima
         super.onDraw(canvas);
         
         canvas.drawRect(cursorLeft, getHeight() - cursorHeight, cursorRight, (float) getHeight(), cursorPaint);
-    }
-
-    private ViewGroup.LayoutParams generateNavItemLayoutParams()
-    {
-        return new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT, 1);
-    }
-
-    private View createTestView(Context context) //TODO remove this function
-    {
-        BottomNavigationItem v = new BottomNavigationItem(context);
-        v.setOnClickListener(this);
-        return v;
     }
 
     private void setCursorToChild(int pos)
