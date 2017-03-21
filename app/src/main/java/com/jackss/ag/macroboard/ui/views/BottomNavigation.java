@@ -2,13 +2,16 @@ package com.jackss.ag.macroboard.ui.views;
 
 import android.animation.ValueAnimator;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Outline;
 import android.graphics.Paint;
+import android.graphics.drawable.Drawable;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewOutlineProvider;
@@ -90,7 +93,8 @@ public class BottomNavigation extends FrameLayout implements ValueAnimator.Anima
         initGraphics();
         initAnimations();
 
-        buildChildren();
+        // if is editor mode add some items to allow view styling
+        if(isInEditMode()) buildTestItems();
     }
     
     
@@ -122,13 +126,18 @@ public class BottomNavigation extends FrameLayout implements ValueAnimator.Anima
         });
     }
 
+    /** When a new item is being created it is passed to this function to setup static configurations.
+     *  For example: colors, condensed mode */
     protected void setupItem(BottomNavigationItem item)
     {
         item.setDefaultColor(defaultItemColor);
         item.setSelectedColor(selectedItemColor);
         item.setCollapsed(condensed);
+        item.setOnClickListener(this);
     }
 
+    /** Called to setup cursor animators. Can be overridden for custom behavior.
+     *  NOTE: super method should be called before custom behavior. */
     protected void setupCursorAnimator(ValueAnimator animator)
     {
         animator.setDuration(cursorAnimDuration);
@@ -136,22 +145,15 @@ public class BottomNavigation extends FrameLayout implements ValueAnimator.Anima
         animator.addUpdateListener(this);
     }
 
-    private void buildChildren()
-    {
-        for(int i = 0; i < 5; ++i) layout.addView(createTestView(getContext()), generateNavItemLayoutParams());
-    }
-
     private ViewGroup.LayoutParams generateNavItemLayoutParams()
     {
         return new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT, 1);
     }
 
-    private View createTestView(Context context) //TODO remove this function
+    // Add 4 dummy items
+    private void buildTestItems()
     {
-        BottomNavigationItem v = new BottomNavigationItem(context);
-        v.setOnClickListener(this);
-        setupItem(v);
-        return v;
+        for(int i = 0; i < 4; ++i) addNavigationItem(null, null);
     }
 
     @Override
@@ -248,8 +250,23 @@ public class BottomNavigation extends FrameLayout implements ValueAnimator.Anima
         }
     }
 
-    public void setOnSelectionListener(OnSelectionListener selectionListener)
+    /** Listens for BottomNavigation selection */
+    public void setOnSelectionListener(@Nullable OnSelectionListener selectionListener)
     {
         this.selectionListener = selectionListener;
+    }
+    
+    /** Add a new NavigationItem at the end of bar
+     * @param labelText Text of the item. If null a default value is used
+     * @param icon Icon of the item. If null a circle icon is used */
+    public void addNavigationItem(String labelText, Drawable icon)
+    {
+        BottomNavigationItem newItem = new BottomNavigationItem(getContext());
+        
+        setupItem(newItem);
+        if(labelText != null) newItem.setLabelText(labelText);
+        if(icon != null) newItem.setIconDrawable(icon);
+
+        layout.addView(newItem, generateNavItemLayoutParams());
     }
 }
