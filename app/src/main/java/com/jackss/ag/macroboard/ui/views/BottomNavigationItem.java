@@ -22,7 +22,9 @@ import com.jackss.ag.macroboard.utils.MBUtils;
 
 
 /**
- *  Item displayed in BottomNavigation
+ *  Item used in BottomNavigation.
+ *
+ *  Nothing should be called on this class, use BottomNavigation methods instead.
  *
  */
 
@@ -35,6 +37,7 @@ public class BottomNavigationItem extends FrameLayout
     private BubbleGenerator bubbleGenerator;
     private GestureDetector detector;
 
+    // Generate a bubble on tap
     private GestureDetector.OnGestureListener gestureListener = new GestureDetector.SimpleOnGestureListener()
     {
         @Override
@@ -128,36 +131,40 @@ public class BottomNavigationItem extends FrameLayout
         setLabelTextById(R.string.bni_dummy_text);
     }
 
-    /** Called when this item need to update his colors.
-     *  ex. when is selected or colors are changed */
+    // Called when this item need to update his colors.
+    // ex. when is selected or colors are changed
     private void updateColors()
     {
         icon.setColorFilter(getCurrentColor());
         label.setTextColor(getCurrentColor());
     }
 
-    /** Get current color for label + icon */
+    /** Get current color ued for label and icon */
     public int getCurrentColor()
     {
         if(isSelected()) return selectedColor;
         else return defaultColor;
     }
 
+    /** Set label text for this item */
     public void setLabelText(String text)
     {
         if(label != null) label.setText(text);
     }
 
+    /** Set label text using a string resource */
     public void setLabelTextById(@StringRes int resId)
     {
         if(label != null) setLabelText(getContext().getResources().getString(resId));
     }
 
+    /** Set the icon for this item */
     public void setIconDrawable(Drawable i)
     {
         if(icon != null) icon.setImageDrawable(i);
     }
 
+    /** Set icon using a drawable resource */
     public void setIconDrawableById(@DrawableRes int resId)
     {
         if(icon != null)
