@@ -128,6 +128,21 @@ public class BottomNavigationItem extends FrameLayout
         setLabelTextById(R.string.bni_dummy_text);
     }
 
+    /** Called when this item need to update his colors.
+     *  ex. when is selected or colors are changed */
+    private void updateColors()
+    {
+        icon.setColorFilter(getCurrentColor());
+        label.setTextColor(getCurrentColor());
+    }
+
+    /** Get current color for label + icon */
+    public int getCurrentColor()
+    {
+        if(isSelected()) return selectedColor;
+        else return defaultColor;
+    }
+
     public void setLabelText(String text)
     {
         if(label != null) label.setText(text);
@@ -137,7 +152,6 @@ public class BottomNavigationItem extends FrameLayout
     {
         if(label != null) setLabelText(getContext().getResources().getString(resId));
     }
-
 
     public void setIconDrawable(Drawable i)
     {
@@ -167,14 +181,20 @@ public class BottomNavigationItem extends FrameLayout
     public void setSelected(boolean selected)
     {
         super.setSelected(selected);
-
-        icon.setColorFilter(getCurrentColor());
-        label.setTextColor(getCurrentColor());
+        updateColors();
     }
 
-    public int getCurrentColor()
+    /** Set color for label + icon when un-selected */
+    public void setDefaultColor(int color)
     {
-        if(isSelected()) return selectedColor;
-        else return defaultColor;
+        defaultColor = color;
+        updateColors();
+    }
+
+    /** Set color for label + icon when selected */
+    public void setSelectedColor(int color)
+    {
+        selectedColor = color;
+        updateColors();
     }
 }
