@@ -2,7 +2,6 @@ package com.jackss.ag.macroboard.ui.views;
 
 import android.animation.ValueAnimator;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -11,7 +10,6 @@ import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewOutlineProvider;
@@ -21,7 +19,15 @@ import android.widget.LinearLayout;
 import com.jackss.ag.macroboard.R;
 
 /**
- *  Bottom navigation used to switch between categories
+ *  Bottom navigation similar to the one defined in material design.
+ *
+ *  Navigation can be filled with NavigationItems using addNavigationItem(...).
+ *  The suggested number of child is between 2 and 6.
+ *
+ *  Condensed mode can be used to hide the text of all the items, reducing its height.
+ *  A cursor (colored underline) is displayed under the selected item.
+ *
+ *  Navigation selection event can be listened using BottomNavigation.OnSelectionLister through its setter
  *
  */
 
@@ -145,6 +151,7 @@ public class BottomNavigation extends FrameLayout implements ValueAnimator.Anima
         animator.addUpdateListener(this);
     }
 
+    // Crate LayoutParams for an item
     private ViewGroup.LayoutParams generateNavItemLayoutParams()
     {
         return new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT, 1);
@@ -173,6 +180,7 @@ public class BottomNavigation extends FrameLayout implements ValueAnimator.Anima
         canvas.drawRect(cursorLeft, getHeight() - cursorHeight, cursorRight, (float) getHeight(), cursorPaint);
     }
 
+    // Teleport the cursor to the specified child position, cancelling animation
     private void setCursorToChild(int pos)
     {
         View child = layout.getChildAt(pos);
@@ -188,6 +196,7 @@ public class BottomNavigation extends FrameLayout implements ValueAnimator.Anima
         invalidate();
     }
 
+    // Animate the cursor to the specified position
     private void moveCursorToChild(int pos)
     {
         View child = layout.getChildAt(pos);
