@@ -9,7 +9,7 @@ import android.util.DisplayMetrics;
 public class MBUtils
 {
     /** Convert dp to px */
-    static int dp2px(float dp)
+    public static int dp2px(float dp)
     {
         return Math.round( Resources.getSystem().getDisplayMetrics().densityDpi / DisplayMetrics.DENSITY_DEFAULT * dp );
     }

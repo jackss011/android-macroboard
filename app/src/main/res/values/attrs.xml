@@ -6,6 +6,16 @@
         <attr name="baseColor" format="color"/>
         <attr name="borderRadius" format="dimension"/>
     </declare-styleable>
+    
+    <!--BottomView-->
+    <declare-styleable name="BottomNavigation">
+        <attr name="defaultItemColor" format="color"/>
+        <attr name="selectedItemColor" format="color"/>
+        <attr name="cursorColor" format="color"/>
+        <attr name="condensed" format="boolean"/>
+        <attr name="cursorAnimDuration" format="integer"/>
+        <attr name="cursorHeight" format="dimension"/>
+    </declare-styleable>
 
     <!-- Knob -->
     <declare-styleable name="Knob" >
