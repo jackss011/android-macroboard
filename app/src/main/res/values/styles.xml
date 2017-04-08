@@ -26,7 +26,7 @@
     </style>
 
     <style name="BottomNavigation.Condensed">
-        <item name="condensed">true</item>
+        <item name="condensedMode">label</item>
     </style>
 
     <style name="Knob" parent="MyBase">
