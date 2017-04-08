@@ -9,7 +9,8 @@
         android:id="@+id/volume_knob"
         android:layout_width="120dp"
         android:layout_height="match_parent"
-        android:padding="10dp" />
+        style="@style/Knob"
+        android:padding="2dp" />
 
     <Button
         android:id="@+id/btn_media_prev"
