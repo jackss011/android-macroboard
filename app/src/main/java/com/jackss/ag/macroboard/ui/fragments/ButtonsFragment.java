@@ -7,48 +7,57 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import com.jackss.ag.macroboard.R;
 import com.jackss.ag.macroboard.ui.views.BottomNavigation;
 import com.jackss.ag.macroboard.ui.views.BottomNavigationItem;
 
 /**
- *  Fragment containing buttons and sections available to the user.
+ *  Fragment containing keyboard commands.
  *
- *  Buttons can be configured in the settings.
+ *  Commands are divided in sections which can be navigated through BottomNavigation.
+ *  Implemented sections:  media controls,  text editing,  custom key macros.
  */
 
 public class ButtonsFragment extends Fragment
 {
-    private ViewGroup buttonsContainer;
+    private ViewGroup sectionsBox;
     private BottomNavigation bottomNavigation;
 
-    private ViewGroup textButtons;
-    private ViewGroup mediaButtons;
-    private TextView customButtons;
+    private ViewGroup textSection;
+    private ViewGroup mediaSection;
+    private ViewGroup customSection;
 
     private BottomNavigation.OnSelectionListener mNavigationListener = new BottomNavigation.OnSelectionListener()
     {
         @Override
         public void onSelection(int pos, BottomNavigationItem item)
         {
+            View selectedSection = null;
+
             switch (pos)
             {
                 case 0:
-                    mediaButtons.setVisibility(View.VISIBLE);
-                    textButtons.setVisibility(View.GONE);
-                    customButtons.setVisibility(View.GONE);
+                    selectedSection = mediaSection;
                     break;
 
                 case 1:
-                    mediaButtons.setVisibility(View.GONE);
-                    textButtons.setVisibility(View.VISIBLE);
-                    customButtons.setVisibility(View.GONE);
+                    selectedSection = textSection;
                     break;
+
                 case 2:
-                    mediaButtons.setVisibility(View.GONE);
-                    textButtons.setVisibility(View.GONE);
-                    customButtons.setVisibility(View.VISIBLE);
+                    selectedSection = customSection;
+                    break;
+            }
+
+            if(selectedSection != null)
+            {
+                mediaSection.setVisibility(View.GONE);
+                textSection.setVisibility(View.GONE);
+                customSection.setVisibility(View.GONE);
+
+                selectedSection.setVisibility(View.VISIBLE);
             }
         }
     };
@@ -62,25 +71,27 @@ public class ButtonsFragment extends Fragment
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
+        // inflate fragment layout
         ViewGroup view = (ViewGroup) inflater.inflate(R.layout.fragment_buttons, container, true);
 
+        // create bottom navigation categories
         bottomNavigation = (BottomNavigation) view.findViewById(R.id.buttons_bottom_nav);
         bottomNavigation.addNavigationItem("Media", null);
         bottomNavigation.addNavigationItem("Text", null);
         bottomNavigation.addNavigationItem("Custom", null);
         bottomNavigation.setOnSelectionListener(mNavigationListener);
 
-        mediaButtons = (ViewGroup) inflater.inflate(R.layout.fragment_buttons_media, buttonsContainer, false);
-        textButtons = (ViewGroup) inflater.inflate(R.layout.fragment_buttons_text, buttonsContainer, false);
+        mediaSection = (ViewGroup) inflater.inflate(R.layout.fragment_buttons_media, sectionsBox, true);
+        textSection = (ViewGroup) inflater.inflate(R.layout.fragment_buttons_text, sectionsBox, true);
 
-        customButtons = new TextView(getContext());
-        customButtons.setText("No custom buttons");
-        customButtons.setPadding(20, 20, 20, 20);
+        // temporary custom macros
+        customSection = buildCustomSection();
 
-        buttonsContainer = (ViewGroup) view.findViewById(R.id.buttons_container);
-        buttonsContainer.addView(mediaButtons);
-        buttonsContainer.addView(textButtons);
-        buttonsContainer.addView(customButtons);
+        // add categories to categories container
+        sectionsBox = (ViewGroup) view.findViewById(R.id.buttons_container);
+        sectionsBox.addView(mediaSection);
+        sectionsBox.addView(textSection);
+        sectionsBox.addView(customSection);
 
         return view;
     }
@@ -89,5 +100,22 @@ public class ButtonsFragment extends Fragment
     public void onAttach(Context context)
     {
         super.onAttach(context);
+    }
+
+    private ViewGroup buildCustomSection()
+    {
+        LinearLayout base = new LinearLayout(getContext());
+        base.setOrientation(LinearLayout.VERTICAL);
+
+        TextView placeholder = new TextView(getContext());
+        placeholder.setText(getString(R.string.custom_category_empty));
+        placeholder.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams
+                (ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        base.setPadding(0, 40, 0, 0);
+        base.addView(placeholder, lp);
+
+        return base;
     }
 }
