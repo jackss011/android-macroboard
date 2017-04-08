@@ -2,6 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context="com.jackss.ag.macroboard.ui.fragments.ButtonsFragment">
 
     <LinearLayout
@@ -19,8 +20,7 @@
             android:id="@+id/buttons_bottom_nav"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:elevation="0dp"
-            android:background="#ffffff"/>
+            style="@style/BottomNavigation" />
 
     </LinearLayout>
 

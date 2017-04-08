@@ -28,9 +28,7 @@
             android:id="@+id/buttons_bottom_nav"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:elevation="0dp"
-            android:background="#ffffff"
-            app:condensed="true"/>
+            style="@style/BottomNavigation.Condensed" />
 
     </LinearLayout>
 
