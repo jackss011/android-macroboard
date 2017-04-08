@@ -51,7 +51,7 @@ public class BottomNavigationItem extends FrameLayout
     private int selectedColor = Color.BLUE;
     private int defaultColor = Color.GRAY;
 
-    private boolean isCollapsed = false;
+    private BottomNavigation.CondensedMode condensedMode = BottomNavigation.CondensedMode.None;
 
 
     public BottomNavigationItem(Context context)
@@ -173,15 +173,28 @@ public class BottomNavigationItem extends FrameLayout
         }
     }
 
-    /** In collapsed mode the label is hidden. Can be use if the space is too small */
-    public void setCollapsed(boolean collapsed)
+    /** Condensed mode allow to save space hiding the label or the icon */
+    public void setCondensedMode(BottomNavigation.CondensedMode condensedMode)
     {
-        isCollapsed = collapsed;
+        this.condensedMode = condensedMode;
 
-        if(label == null) return;
+        switch (condensedMode)
+        {
+            case None:
+                label.setVisibility(VISIBLE);
+                icon.setVisibility(VISIBLE);
+                break;
 
-        if(isCollapsed) label.setVisibility(GONE);
-        else label.setVisibility(VISIBLE);
+            case Label:
+                label.setVisibility(GONE);
+                icon.setVisibility(VISIBLE);
+                break;
+
+            case Icon:
+                label.setVisibility(VISIBLE);
+                icon.setVisibility(GONE);
+                break;
+        }
     }
 
     @Override

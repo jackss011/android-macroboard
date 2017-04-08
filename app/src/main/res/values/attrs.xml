@@ -12,7 +12,11 @@
         <attr name="defaultItemColor" format="color"/>
         <attr name="selectedItemColor" format="color"/>
         <attr name="cursorColor" format="color"/>
-        <attr name="condensed" format="boolean"/>
+        <attr name="condensedMode" format="enum">
+            <enum name="none" value="0"/>
+            <enum name="label" value="1"/>
+            <enum name="icon" value="2"/>
+        </attr>
         <attr name="cursorAnimDuration" format="integer"/>
         <attr name="cursorHeight" format="dimension"/>
     </declare-styleable>

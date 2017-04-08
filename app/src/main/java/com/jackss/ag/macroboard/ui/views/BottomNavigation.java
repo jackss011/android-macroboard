@@ -42,7 +42,7 @@ public class BottomNavigation extends FrameLayout implements ValueAnimator.Anima
     private int defaultItemColor = Color.GRAY;
     private int selectedItemColor = Color.BLUE;
     private int cursorColor = Color.RED;
-    private boolean condensed = false;
+    private CondensedMode condensedMode;
     private int cursorAnimDuration = 200;
     private int cursorHeight = 12;
 
@@ -55,6 +55,13 @@ public class BottomNavigation extends FrameLayout implements ValueAnimator.Anima
 
 
     public interface OnSelectionListener { void onSelection(int pos, BottomNavigationItem item); }
+
+    public enum CondensedMode
+    {
+        None, // Show label and icon
+        Label, // Hide the label
+        Icon // Hide the icon
+    }
 
 
     public BottomNavigation(Context context)
@@ -81,8 +88,8 @@ public class BottomNavigation extends FrameLayout implements ValueAnimator.Anima
         {
             defaultItemColor = a.getColor(R.styleable.BottomNavigation_defaultItemColor, defaultItemColor);
             selectedItemColor = a.getColor(R.styleable.BottomNavigation_selectedItemColor, selectedItemColor);
-            condensed = a.getBoolean(R.styleable.BottomNavigation_condensed, condensed);
-
+            condensedMode = resolveCondensedMode( a.getInteger(R.styleable.BottomNavigation_condensedMode, 0) );
+            
             cursorColor = a.getColor(R.styleable.BottomNavigation_cursorColor, selectedItemColor);
             cursorAnimDuration = a.getInt(R.styleable.BottomNavigation_cursorAnimDuration, cursorAnimDuration);
             cursorHeight = (int) a.getDimension(R.styleable.BottomNavigation_cursorHeight, cursorHeight);
@@ -132,13 +139,26 @@ public class BottomNavigation extends FrameLayout implements ValueAnimator.Anima
         });
     }
 
+    // map an int used in the xml enum value to a real java enum
+    private CondensedMode resolveCondensedMode(int attrValue)
+    {
+        switch (attrValue)
+        {
+            case 0: return CondensedMode.None;
+            case 1: return CondensedMode.Label;
+            case 2: return CondensedMode.Icon;
+
+            default: return CondensedMode.None;
+        }
+    }
+
     /** When a new item is being created it is passed to this function to setup static configurations.
      *  For example: colors, condensed mode */
     protected void setupItem(BottomNavigationItem item)
     {
         item.setDefaultColor(defaultItemColor);
         item.setSelectedColor(selectedItemColor);
-        item.setCollapsed(condensed);
+        item.setCondensedMode(condensedMode);
         item.setOnClickListener(this);
     }
 
