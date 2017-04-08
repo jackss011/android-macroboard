@@ -9,6 +9,7 @@
         android:id="@+id/volume_knob"
         android:layout_width="match_parent"
         android:layout_height="120dp"
+        style="@style/Knob"
         android:padding="8dp"/>
 
     <LinearLayout

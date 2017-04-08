@@ -29,6 +29,14 @@
         <item name="condensed">true</item>
     </style>
 
+    <style name="Knob" parent="MyBase">
+        <item name="circleColor">#cacaca</item>
+        <item name="strokeColor">#555</item>
+        <item name="strokeWidth">1dp</item>
+        <item name="notchColor">#666</item>
+        <item name="notchDisplacement">0.3</item>
+        <item name="notchSizePerc">0.06</item>
+    </style>
 
 
 </resources>
