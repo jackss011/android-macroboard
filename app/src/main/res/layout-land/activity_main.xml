@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/activity_main"
     android:layout_width="match_parent"
@@ -8,15 +7,11 @@
     android:orientation="horizontal"
     tools:context="com.jackss.ag.macroboard.ui.activities.MainActivity">
 
-
-
-
     <com.jackss.ag.macroboard.ui.views.TrackpadView
-        android:padding="10dp"
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_weight="1"/>
-
+        android:layout_weight="1"
+        android:padding="@dimen/trackpad_padding"/>
 
     <fragment
         android:id="@+id/btn_frag"

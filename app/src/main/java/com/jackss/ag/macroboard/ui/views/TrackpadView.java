@@ -52,7 +52,7 @@ public class TrackpadView extends View
     {
         super.onSizeChanged(w, h, oldw, oldh);
 
-        baseRect = new RectF(0, 0, w, h);
+        baseRect = new RectF(getPaddingLeft(), getPaddingTop(), w - getPaddingLeft(), h - getPaddingBottom());
     }
 
     @Override

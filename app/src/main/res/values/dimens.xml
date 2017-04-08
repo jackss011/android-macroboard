@@ -2,4 +2,5 @@
     <!-- Default screen margins, per the Android Design guidelines. -->
     <dimen name="activity_horizontal_margin">14dp</dimen>
     <dimen name="activity_vertical_margin">14dp</dimen>
+    <dimen name="trackpad_padding">4dp</dimen>
 </resources>
