@@ -20,19 +20,24 @@ public class Knob extends View
 {
     // Constants
     final private static int DEF_POSITION_ANIM_DURATION = 300;
+    final private static float STATIC_CIRCLE_PADDING = 10;
 
     // Calculated variables
+    private RectF backgroundRect = new RectF();
     private RectF circleBounds = new RectF();
     private RectF innerCircleBounds = new RectF();
     private float notchY;
     private float notchRadius;
 
     // Draw helpers
+    private Paint backgroundPaint;
     private Paint circlePaint;
     private Paint circleStrokePaint;
     private Paint notchPaint;
 
     // Attributes
+    private int backgroundColor;
+    private float backgroundRadius = 4.f;
     private int circleColor = Color.GRAY;
     private int strokeColor = Color.DKGRAY;
     private float strokeWidth = 4.f;
@@ -76,14 +81,25 @@ public class Knob extends View
             public void getOutline(View view, Outline outline)
             {
                 Rect r = new Rect();
-                circleBounds.roundOut(r);
-                outline.setOval(r);
+
+                if(backgroundColor != 0)
+                {
+                    backgroundRect.roundOut(r);
+                    outline.setRoundRect(r, backgroundRadius);
+                }
+                else
+                {
+                    circleBounds.roundOut(r);
+                    outline.setOval(r);
+                }
             }
         });
 
         TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.Knob);
         try
         {
+            backgroundColor = a.getColor(R.styleable.Knob_backgroundColor, 0);
+            backgroundRadius = a.getDimension(R.styleable.Knob_backgroundRadius, backgroundRadius);
             circleColor = a.getColor(R.styleable.Knob_circleColor, circleColor);
             strokeColor = a.getColor(R.styleable.Knob_strokeColor, strokeColor);
             strokeWidth = a.getDimension(R.styleable.Knob_strokeWidth, strokeWidth);
@@ -100,6 +116,10 @@ public class Knob extends View
 
     private void initGraphics()
     {
+        backgroundPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        backgroundPaint.setStyle(Paint.Style.FILL);
+        backgroundPaint.setColor(backgroundColor);
+
         circlePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         circlePaint.setStyle(Paint.Style.FILL);
         circlePaint.setColor(circleColor);
@@ -134,7 +154,12 @@ public class Knob extends View
     {
         super.onSizeChanged(w, h, oldw, oldh);
 
-        circleBounds = new RectF(getPaddingLeft(), getPaddingTop(), w - getPaddingRight(), h - getPaddingBottom());
+        backgroundRect.set(getPaddingLeft(), getPaddingTop(), w - getPaddingRight(), h - getPaddingBottom());
+
+        circleBounds.set(backgroundRect);
+        circleBounds.inset(STATIC_CIRCLE_PADDING, STATIC_CIRCLE_PADDING);
+
+        // shrink the main circle bounds to be rectangular
         if(circleBounds.height() > circleBounds.width())
             circleBounds.inset(0, (circleBounds.height() - circleBounds.width()) / 2);
         else
@@ -151,6 +176,8 @@ public class Knob extends View
     protected void onDraw(Canvas canvas)
     {
         super.onDraw(canvas);
+
+        canvas.drawRoundRect(backgroundRect, backgroundRadius, backgroundRadius, backgroundPaint);
 
         if(strokeWidth > 0.5f) canvas.drawOval(circleBounds, circleStrokePaint);
         canvas.drawOval(innerCircleBounds, circlePaint);
