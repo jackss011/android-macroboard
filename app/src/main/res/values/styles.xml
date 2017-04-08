@@ -36,7 +36,11 @@
         <item name="notchColor">#666</item>
         <item name="notchDisplacement">0.3</item>
         <item name="notchSizePerc">0.06</item>
+        <item name="android:elevation">2dp</item>
     </style>
 
-
+    <style name="Trackpad" parent="MyBase">
+        <item name="android:elevation">2dp</item>
+    </style>
+    
 </resources>

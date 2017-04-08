@@ -2,12 +2,10 @@ package com.jackss.ag.macroboard.ui.views;
 
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.RectF;
+import android.graphics.*;
 import android.util.AttributeSet;
 import android.view.View;
+import android.view.ViewOutlineProvider;
 import com.jackss.ag.macroboard.R;
 
 /**
@@ -41,6 +39,20 @@ public class TrackpadView extends View
             borderRadius = a.getDimension(R.styleable.TrackpadView_baseColor, borderRadius);
         }
         finally { a.recycle(); }
+
+        setOutlineProvider(new ViewOutlineProvider()
+        {
+            @Override
+            public void getOutline(View view, Outline outline)
+            {
+                if(baseRect != null)
+                {
+                    Rect rect = new Rect();
+                    baseRect.roundOut(rect);
+                    outline.setRoundRect(rect, borderRadius);
+                }
+            }
+        });
 
         initGraphics();
     }
