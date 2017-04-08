@@ -10,6 +10,14 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
+        <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/colorPrimary"
+        android:minHeight="?attr/actionBarSize"
+        app:titleTextAppearance="@style/ToolbarTitle"/>
+
         <FrameLayout
             android:id="@+id/buttons_container"
             android:layout_width="match_parent"
@@ -20,7 +28,7 @@
             android:id="@+id/buttons_bottom_nav"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            style="@style/BottomNavigation" />
+            style="@style/BottomNavigation.Condensed" />
 
     </LinearLayout>
 

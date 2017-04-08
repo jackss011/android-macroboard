@@ -7,10 +7,15 @@ import com.jackss.ag.macroboard.R;
 
 public class MainActivity extends AppCompatActivity
 {
+    Toolbar toolbar;
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setTitle("Dumb Title");
     }
 }
