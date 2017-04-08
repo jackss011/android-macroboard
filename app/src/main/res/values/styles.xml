@@ -22,7 +22,7 @@
         <item name="selectedItemColor">@color/nNav_itemSel</item>
         <item name="cursorHeight">4dp</item>
         <item name="cursorAnimDuration">100</item>
-        <item name="android:elevation">8dp</item>
+        <item name="android:elevation">6dp</item>
     </style>
 
     <style name="BottomNavigation.Condensed">

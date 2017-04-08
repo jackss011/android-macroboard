@@ -7,4 +7,6 @@
     <color name="bNav_background">#f6f6f6</color>
     <color name="bNav_item">#777</color>
     <color name="nNav_itemSel">@color/colorPrimary</color>
+
+    <color name="buttons_background">#f4f4f4</color>
 </resources>
