@@ -33,4 +33,9 @@
         <attr name="notchSizePerc" format="float"/>
     </declare-styleable>
 
+    <declare-styleable name="MaterialButton">
+        <attr name="backgroundColor"/>
+        <attr name="iconSrc" format="reference"/>
+    </declare-styleable>
+
 </resources>

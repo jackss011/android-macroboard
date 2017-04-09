@@ -1,6 +1,7 @@
 package com.jackss.ag.macroboard.ui.views;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.*;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.Nullable;
@@ -49,7 +50,15 @@ public class MaterialButton extends View
 
         setClickable(true);
 
-        icon = getResources().getDrawable(R.drawable.ic_test_icon, null);
+        TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.MaterialButton, defStyleAttr, defStyleRes);
+        try
+        {
+            backgroundColor = a.getColor(R.styleable.MaterialButton_backgroundColor, backgroundColor);
+            icon = a.getDrawable(R.styleable.MaterialButton_iconSrc);
+        }
+        finally { a.recycle(); }
+
+        if(icon == null) icon = getResources().getDrawable(R.drawable.ic_test_icon, null);
 
         gestureDetector = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener()
         {
