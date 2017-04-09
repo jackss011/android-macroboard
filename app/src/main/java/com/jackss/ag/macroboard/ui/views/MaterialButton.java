@@ -5,9 +5,12 @@ import android.graphics.*;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
+import android.util.Log;
+import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 import com.jackss.ag.macroboard.R;
+import com.jackss.ag.macroboard.utils.BubbleGenerator;
 import com.jackss.ag.macroboard.utils.MBUtils;
 
 /**
@@ -16,6 +19,8 @@ import com.jackss.ag.macroboard.utils.MBUtils;
  */
 public class MaterialButton extends View
 {
+    private static final String TAG = "MaterialButton";
+
     private static final int DESIRED_BACKGROUND_DP = 56;
 
     Paint backgroundPaint;
@@ -24,9 +29,12 @@ public class MaterialButton extends View
     RectF backgroundRect = new RectF();
     Rect iconRect = new Rect();
 
-    int backgroundColor = Color.DKGRAY;
+    int backgroundColor = Color.GRAY;
     float cornerRadius = MBUtils.dp2px(2);
     int iconSize = MBUtils.dp2px(24);
+
+    BubbleGenerator bubbleGenerator;
+    GestureDetector gestureDetector;
 
 
     public MaterialButton(Context context) { this(context, null); }
@@ -39,7 +47,22 @@ public class MaterialButton extends View
     {
         super(context, attrs, defStyleAttr, defStyleRes);
 
+        setClickable(true);
+
         icon = getResources().getDrawable(R.drawable.ic_test_icon, null);
+
+        gestureDetector = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener()
+        {
+            @Override
+            public boolean onSingleTapUp(MotionEvent e)
+            {
+                if (bubbleGenerator != null) bubbleGenerator.generateBubble(e.getX(), e.getY());
+                return false;
+            }
+        });
+        bubbleGenerator = new BubbleGenerator(this);
+        bubbleGenerator.setBubbleColor(Color.DKGRAY);
+        bubbleGenerator.setMaxOpacity(0.6f);
 
         initGraphics();
     }
@@ -58,6 +81,8 @@ public class MaterialButton extends View
         backgroundRect.round(iconRect);
         iconRect.inset(Math.round(wi), Math.round(hi));
         icon.setBounds(iconRect);
+
+        bubbleGenerator.determinateMaxRadius();
     }
 
     @Override
@@ -85,14 +110,20 @@ public class MaterialButton extends View
         // draw the background rect
         canvas.drawRoundRect(backgroundRect, cornerRadius, cornerRadius, backgroundPaint);
 
-        // draw the icon
         icon.draw(canvas);
+
+        canvas.save();
+        canvas.clipRect(backgroundRect);
+        bubbleGenerator.draw(canvas);
+        canvas.restore();
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent event)
     {
-        return true;
+        gestureDetector.onTouchEvent(event);
+
+        return super.onTouchEvent(event);
     }
 
     private void initGraphics()
@@ -100,6 +131,5 @@ public class MaterialButton extends View
         backgroundPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         backgroundPaint.setStyle(Paint.Style.FILL);
         backgroundPaint.setColor(backgroundColor);
-
     }
 }
