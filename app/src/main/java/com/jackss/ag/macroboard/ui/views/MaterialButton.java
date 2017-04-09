@@ -16,6 +16,8 @@ import com.jackss.ag.macroboard.utils.MBUtils;
  */
 public class MaterialButton extends View
 {
+    private static final int DESIRED_BACKGROUND_DP = 56;
+
     Paint backgroundPaint;
     Drawable icon;
 
@@ -62,6 +64,17 @@ public class MaterialButton extends View
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec)
     {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+
+        final int desiredSize = MBUtils.dp2px(DESIRED_BACKGROUND_DP);
+
+        //
+        final int desiredW = desiredSize + getPaddingLeft() + getPaddingRight();
+        final int desiredH = desiredSize + getPaddingTop() + getPaddingBottom();
+
+        int measuredW = MBUtils.resolveDesiredMeasure(widthMeasureSpec, desiredW);
+        int measuredH = MBUtils.resolveDesiredMeasure(heightMeasureSpec, desiredH);
+
+        setMeasuredDimension(measuredW, measuredH);
     }
 
     @Override
