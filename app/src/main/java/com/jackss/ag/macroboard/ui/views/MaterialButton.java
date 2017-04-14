@@ -32,7 +32,7 @@ public class MaterialButton extends View
     int backgroundColor = Color.GRAY;
     float cornerRadius = MBUtils.dp2px(2);
     int iconSize = MBUtils.dp2px(24);
-    float backgroundColorSaturation = 0.85f;
+    float backgroundSaturationMultiplier = 0.85f;
 
     // Background press effects
     int backgroundPressedColor = Color.DKGRAY;
@@ -107,13 +107,13 @@ public class MaterialButton extends View
         {
             backgroundColor = a.getColor(R.styleable.MaterialButton_backgroundColor, backgroundColor);
             icon = a.getDrawable(R.styleable.MaterialButton_iconSrc);
-            backgroundColorSaturation = a.getFloat(R.styleable.MaterialButton_backgroundColorSaturation, backgroundColorSaturation);
+            backgroundSaturationMultiplier = a.getFloat(R.styleable.MaterialButton_backgroundSaturationMultiplier, backgroundSaturationMultiplier);
         }
         finally { a.recycle(); }
 
         if(icon == null) icon = getResources().getDrawable(R.drawable.ic_test_icon, null);
 
-        backgroundPressedColor = MBUtils.saturateColor(backgroundColor, backgroundColorSaturation);
+        backgroundPressedColor = MBUtils.saturateColor(backgroundColor, backgroundSaturationMultiplier);
         backgroundColorEvaluator = new CachedArgbEvaluator(backgroundColor, backgroundPressedColor);
 
         initGraphics();
