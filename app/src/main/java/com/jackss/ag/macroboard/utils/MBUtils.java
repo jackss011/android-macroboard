@@ -1,6 +1,7 @@
 package com.jackss.ag.macroboard.utils;
 
 import android.content.res.Resources;
+import android.graphics.Color;
 import android.util.DisplayMetrics;
 import android.view.View;
 
@@ -31,5 +32,15 @@ public class MBUtils
             else
                 return size;
         }
+    }
+
+    /** Modify the saturation of a color which is converted temporarily to HSV */
+    public static int saturateColor(int color, float amount)
+    {
+        float hsv[] = new float[3];
+        Color.colorToHSV(color, hsv);
+        hsv[2] = hsv[2] * amount;
+
+        return Color.HSVToColor(hsv);
     }
 }

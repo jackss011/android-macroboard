@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewOutlineProvider;
 import com.jackss.ag.macroboard.R;
 import com.jackss.ag.macroboard.utils.BubbleGenerator;
+import com.jackss.ag.macroboard.utils.CachedArgbEvaluator;
 import com.jackss.ag.macroboard.utils.MBUtils;
 import com.jackss.ag.macroboard.utils.ViewLifter;
 
@@ -34,9 +35,29 @@ public class MaterialButton extends View implements ButtonDetector.OnButtonEvent
     float cornerRadius = MBUtils.dp2px(2);
     int iconSize = MBUtils.dp2px(24);
 
+    int backgroundPressedColor = Color.DKGRAY;
+    CachedArgbEvaluator backgroundColorEvaluator;
+
     BubbleGenerator bubbleGenerator;
     ViewLifter lifter;
     ButtonDetector detector;
+
+    ViewLifter.OnLifterUpdateListener mLifterUpdateListener = new ViewLifter.OnLifterUpdateListener()
+    {
+        @Override
+        public void onLifterUpdate(float fraction)
+        {
+            backgroundPaint.setColor(backgroundColorEvaluator.evaluate(fraction));
+            invalidate();
+        }
+
+        @Override
+        public void onLifterCancel()
+        {
+            backgroundPaint.setColor(backgroundColor);
+            invalidate();
+        }
+    };
 
 
     public MaterialButton(Context context) { this(context, null); }
@@ -60,14 +81,17 @@ public class MaterialButton extends View implements ButtonDetector.OnButtonEvent
         finally { a.recycle(); }
 
         if(icon == null) icon = getResources().getDrawable(R.drawable.ic_test_icon, null);
+        
+        backgroundPressedColor = MBUtils.saturateColor(backgroundColor, 0.85f);
+        backgroundColorEvaluator = new CachedArgbEvaluator(backgroundColor, backgroundPressedColor);
 
         bubbleGenerator = new BubbleGenerator(this)
-            .setBubbleColor(Color.GRAY)
+            .setBubbleColor(Color.DKGRAY)
             .setMaxOpacity(0.3f)
             .setDuration(400);
 
-        lifter = new ViewLifter(this, 4);
         detector = new ButtonDetector(this, 200);
+        lifter = new ViewLifter(this, 4).setLifterUpdateListener(mLifterUpdateListener);
 
         initGraphics();
         initOutline();

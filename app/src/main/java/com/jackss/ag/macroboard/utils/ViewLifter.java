@@ -2,6 +2,7 @@ package com.jackss.ag.macroboard.utils;
 
 import android.animation.ValueAnimator;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
 
@@ -20,9 +21,11 @@ public class ViewLifter
     private float defaultElevation;
     private float raisedElevation;
 
+    private boolean isRaising;
+
     private ValueAnimator elevationAnimator = ValueAnimator.ofFloat();
 
-    private ValueAnimator.AnimatorUpdateListener mUpdateListener = new ValueAnimator.AnimatorUpdateListener()
+    private ValueAnimator.AnimatorUpdateListener animatorUpdateListener = new ValueAnimator.AnimatorUpdateListener()
     {
         @Override
         public void onAnimationUpdate(ValueAnimator animation)
@@ -30,8 +33,25 @@ public class ViewLifter
             if(animation != elevationAnimator) return;
 
             view.setElevation((float) elevationAnimator.getAnimatedValue());
+
+            if(lifterUpdateListener != null)
+            {
+                float fraction = elevationAnimator.getAnimatedFraction();
+                if(!isRaising) fraction = 1.f - fraction;
+
+                lifterUpdateListener.onLifterUpdate(fraction);
+            }
         }
     };
+
+    public interface OnLifterUpdateListener
+    {
+        void onLifterUpdate(float fraction);
+
+        void onLifterCancel();
+    }
+
+    private OnLifterUpdateListener lifterUpdateListener;
 
 
     public ViewLifter(@NonNull View view)
@@ -46,7 +66,7 @@ public class ViewLifter
         defaultElevation = view.getElevation();
         raisedElevation = elevationMultiplier * defaultElevation;
 
-        elevationAnimator.addUpdateListener(mUpdateListener);
+        elevationAnimator.addUpdateListener(animatorUpdateListener);
         elevationAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
         elevationAnimator.setDuration(150);
     }
@@ -56,14 +76,27 @@ public class ViewLifter
         return elevationAnimator;
     }
 
+    /**
+     * Set a listener listening for raise, drop updates and cancel.
+     * Can be used in the view to play visual effects (ex. background color change)
+     * */
+    public ViewLifter setLifterUpdateListener(@Nullable OnLifterUpdateListener listener)
+    {
+        lifterUpdateListener = listener;
+        return this;
+    }
+
+
     public void raise()
     {
+        isRaising = true;
         elevationAnimator.setFloatValues(view.getElevation(), raisedElevation);
         elevationAnimator.start();
     }
 
     public void drop()
     {
+        isRaising = false;
         elevationAnimator.setFloatValues(view.getElevation(), defaultElevation);
         elevationAnimator.start();
     }
@@ -72,5 +105,7 @@ public class ViewLifter
     {
         elevationAnimator.cancel();
         view.setElevation(defaultElevation);
+
+        if(lifterUpdateListener != null) lifterUpdateListener.onLifterCancel();
     }
 }
