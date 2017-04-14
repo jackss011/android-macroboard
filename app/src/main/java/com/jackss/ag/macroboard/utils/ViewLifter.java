@@ -16,6 +16,9 @@ import android.view.animation.AccelerateDecelerateInterpolator;
  */
 public class ViewLifter
 {
+    public final static float DEFAULT_ELEVATION_MULTIPLIER = 4.f;
+    public final static int DEFAULT_LIFT_DURATION = 150;
+
     private final View view;
 
     private float defaultElevation;
@@ -56,7 +59,7 @@ public class ViewLifter
 
     public ViewLifter(@NonNull View view)
     {
-        this(view, 1);
+        this(view, DEFAULT_ELEVATION_MULTIPLIER);
     }
 
     public ViewLifter(@NonNull View view, float elevationMultiplier)
@@ -68,7 +71,7 @@ public class ViewLifter
 
         elevationAnimator.addUpdateListener(animatorUpdateListener);
         elevationAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
-        elevationAnimator.setDuration(150);
+        elevationAnimator.setDuration(DEFAULT_LIFT_DURATION);
     }
 
     public ValueAnimator getElevationAnimator()

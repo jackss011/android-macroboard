@@ -16,29 +16,33 @@ import com.jackss.ag.macroboard.utils.*;
  * Cool button
  *
  */
-public class MaterialButton extends View implements ButtonDetector.OnButtonEventListener
+public class MaterialButton extends View
 {
     private static final String TAG = "MaterialButton";
 
     private static final int DESIRED_BACKGROUND_DP = 56;
 
+    // Graphics helper
     Paint backgroundPaint;
     Drawable icon;
-
     RectF backgroundRect = new RectF();
     Rect iconRect = new Rect();
 
+    // XML attrs
     int backgroundColor = Color.GRAY;
     float cornerRadius = MBUtils.dp2px(2);
     int iconSize = MBUtils.dp2px(24);
     float backgroundColorSaturation = 0.85f;
 
+    // Background press effects
     int backgroundPressedColor = Color.DKGRAY;
     CachedArgbEvaluator backgroundColorEvaluator;
 
+    // Helpers
     BubbleGenerator bubbleGenerator;
     ViewLifter lifter;
     ButtonDetector detector;
+
 
     ViewLifter.OnLifterUpdateListener mLifterUpdateListener = new ViewLifter.OnLifterUpdateListener()
     {
@@ -54,6 +58,34 @@ public class MaterialButton extends View implements ButtonDetector.OnButtonEvent
         {
             backgroundPaint.setColor(backgroundColor);
             invalidate();
+        }
+    };
+
+    ButtonDetector.OnButtonEventListener mButtonEventListener = new ButtonDetector.OnButtonEventListener()
+    {
+        @Override
+        public void onDown(float x, float y)
+        {
+            lifter.raise();
+        }
+
+        @Override
+        public void onUp(float x, float y)
+        {
+            lifter.drop();
+        }
+
+        @Override
+        public void onTap(float x, float y)
+        {
+            lifter.drop();
+            bubbleGenerator.generateBubble(x, y);
+        }
+
+        @Override
+        public void onCancel()
+        {
+            lifter.cancel();
         }
     };
 
@@ -84,18 +116,43 @@ public class MaterialButton extends View implements ButtonDetector.OnButtonEvent
         backgroundPressedColor = MBUtils.saturateColor(backgroundColor, backgroundColorSaturation);
         backgroundColorEvaluator = new CachedArgbEvaluator(backgroundColor, backgroundPressedColor);
 
-        bubbleGenerator = new BubbleGenerator(this)
-            .setBubbleColor(Color.DKGRAY)
-            .setMaxOpacity(0.3f)
-            .setDuration(400);
-
-        detector = new ButtonDetector(this, 200);
-        lifter = new ViewLifter(this, 4).setLifterUpdateListener(mLifterUpdateListener);
-
         initGraphics();
         initOutline();
+        initHelpers();
     }
 
+
+    private void initGraphics()
+    {
+        backgroundPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        backgroundPaint.setStyle(Paint.Style.FILL);
+        backgroundPaint.setColor(backgroundColor);
+    }
+
+    private void initOutline()
+    {
+        setOutlineProvider(new ViewOutlineProvider()
+        {
+            @Override
+            public void getOutline(View view, Outline outline)
+            {
+                Rect bounds = new Rect();
+                backgroundRect.round(bounds);
+                outline.setRoundRect(bounds, cornerRadius);
+            }
+        });
+    }
+
+    private void initHelpers()
+    {
+        bubbleGenerator = new BubbleGenerator(this)  //TODO: hardcoded values
+                .setBubbleColor(Color.DKGRAY)
+                .setMaxOpacity(0.3f)
+                .setDuration(400);
+
+        detector = new ButtonDetector(mButtonEventListener, ButtonDetector.DEFAULT_TAP_DURATION);
+        lifter = new ViewLifter(this).setLifterUpdateListener(mLifterUpdateListener);
+    }
 
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh)
@@ -121,7 +178,6 @@ public class MaterialButton extends View implements ButtonDetector.OnButtonEvent
 
         final int desiredSize = MBUtils.dp2px(DESIRED_BACKGROUND_DP);
 
-        //
         final int desiredW = desiredSize + getPaddingLeft() + getPaddingRight();
         final int desiredH = desiredSize + getPaddingTop() + getPaddingBottom();
 
@@ -153,51 +209,5 @@ public class MaterialButton extends View implements ButtonDetector.OnButtonEvent
         detector.onTouchEvent(event);
 
         return super.onTouchEvent(event);
-    }
-
-    private void initGraphics()
-    {
-        backgroundPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        backgroundPaint.setStyle(Paint.Style.FILL);
-        backgroundPaint.setColor(backgroundColor);
-    }
-
-    private void initOutline()
-    {
-        setOutlineProvider(new ViewOutlineProvider()
-        {
-            @Override
-            public void getOutline(View view, Outline outline)
-            {
-                Rect bounds = new Rect();
-                backgroundRect.round(bounds);
-                outline.setRoundRect(bounds, cornerRadius);
-            }
-        });
-    }
-
-    @Override
-    public void onDown(float x, float y)
-    {
-        lifter.raise();
-    }
-
-    @Override
-    public void onUp(float x, float y)
-    {
-        lifter.drop();
-    }
-
-    @Override
-    public void onTap(float x, float y)
-    {
-        lifter.drop();
-        bubbleGenerator.generateBubble(x, y);
-    }
-
-    @Override
-    public void onCancel()
-    {
-        lifter.cancel();
     }
 }

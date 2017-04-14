@@ -5,10 +5,14 @@ import android.view.MotionEvent;
 /**
  * Utility class used to parse on touch events.
  * 
- * Callbacks available are defined in OnButtonEventListener
+ * Callbacks available are defined in OnButtonEventListener.
+ *
+ * If tap duration is lesser than 0, onTap(...) is never called. onUp(...) is called instead.
  */
 public class ButtonDetector
 {
+    public final static int DEFAULT_TAP_DURATION = 200;
+
     public interface OnButtonEventListener
     {
         /** First finger down */
@@ -17,7 +21,7 @@ public class ButtonDetector
         /** First finger up. Not called on tap events */
         void onUp(float x, float y);
 
-        /** Called insted of onUp(x, y) if the press time is < than tapDuration */
+        /** Called instead of onUp(x, y) if press time is lesser than tapDuration */
         void onTap(float x, float y);
 
         /** Called when ACTION_CANCEL is found in a parsed event */
@@ -43,9 +47,17 @@ public class ButtonDetector
     }
 
 
+    /** Return true if onTap(..) will be called (i.e tapDuration > 0). */
     public boolean isTapEnabled()
     {
         return tapDuration > 0;
+    }
+
+    /** Set max tap duration. If duration < 0 onUp(...) is called instead of onTap(...) */
+    public ButtonDetector setTapDuration(int duration)
+    {
+        tapDuration = duration;
+        return this;
     }
 
     public void onTouchEvent(MotionEvent event)
