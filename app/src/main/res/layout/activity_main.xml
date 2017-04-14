@@ -24,6 +24,7 @@
         style="@style/Trackpad"
         android:padding="@dimen/trackpad_padding" />
 
+    <View style="@style/Divider.Horizontal"/>
 
     <fragment
         android:id="@+id/btn_frag"
