@@ -10,13 +10,21 @@ import android.view.View;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.LinearInterpolator;
 
-import java.sql.Time;
 
 /**
- * Utility class used to draw color bubbles on custom views
+ * Utility class used to draw colored circles which expands over time.
+ * Useful to give visual feedback in response to a click.
  *
+ * Implementation steps:
+ *
+ * 1. Create an object using a provided constructor
+ * 2. Set the animation values
+ * 3. Add BubbleGenerator.draw(canvas) inside View.onDraw(canvas)
+ * 4. Call generateBubble(x, y) to start drawing a bubble in that position
+ *
+ * determinateRadius() can be used to try to calculate a good max radius for the bubble
+ * based on the view size.
  */
-
 public class BubbleGenerator implements ValueAnimator.AnimatorUpdateListener
 {
     // default values for variables
