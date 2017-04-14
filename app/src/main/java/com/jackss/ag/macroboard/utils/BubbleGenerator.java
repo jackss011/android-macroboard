@@ -136,42 +136,48 @@ public class BubbleGenerator implements ValueAnimator.AnimatorUpdateListener
         return bubbleColor;
     }
 
-    public void setDuration(int duration)
+    public BubbleGenerator setDuration(int duration)
     {
         this.duration = duration;
-
         radiusAnimator.setDuration(this.duration);
         opacityAnimator.setDuration(this.duration);
+
+        return this;
     }
 
-    public void setMaxRadius(float maxRadius)
+    public BubbleGenerator setMaxRadius(float maxRadius)
     {
         this.maxRadius = maxRadius;
-
         radiusAnimator.setFloatValues(0.f, this.maxRadius);
+
+        return this;
     }
 
-    public void setMaxOpacity(float maxOpacity)
+    public BubbleGenerator setMaxOpacity(float maxOpacity)
     {
         this.maxOpacity = maxOpacity;
-
         opacityAnimator.setFloatValues(this.maxOpacity, 0.f);
+
+        return this;
     }
 
-    public void setBubbleColor(int color)
+    public BubbleGenerator setBubbleColor(int color)
     {
         this.bubbleColor = color;
-
         if(bubblePaint != null) bubblePaint.setColor(this.bubbleColor);
+
+        return this;
     }
 
     /** Set maximum radius based on parent dimensions. Should be called after every resize (i.e View.onSizeChanged(...)) */
-    public void determinateMaxRadius()
+    public BubbleGenerator determinateMaxRadius()
     {
         if(parent != null)
         {
             final float diagonal = (float) Math.sqrt(Math.pow(parent.getWidth(), 2.f) + Math.pow(parent.getHeight(), 2.f)) / 2;
             setMaxRadius(1.3f * diagonal); // slightly increase diagonal radius
         }
+
+        return this;
     }
 }

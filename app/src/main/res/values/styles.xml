@@ -43,5 +43,15 @@
     <style name="Trackpad" parent="MyBase">
         <item name="android:elevation">1dp</item>
     </style>
+
+    <style name="MaterialButton" parent="MyBase">
+        <item name="backgroundColor">@color/colorAccent</item>
+        <item name="android:elevation">2dp</item>
+    </style>
+
+    <style name="MaterialButton.Cut">
+        <item name="iconSrc">@drawable/bni_dummy_icon</item>
+        <item name="backgroundSaturationMultiplier">0.87</item>
+    </style>
     
 </resources>
