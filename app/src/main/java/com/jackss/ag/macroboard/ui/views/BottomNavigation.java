@@ -30,7 +30,6 @@ import com.jackss.ag.macroboard.R;
  *  Navigation selection event can be listened using BottomNavigation.OnSelectionLister through its setter
  *
  */
-
 public class BottomNavigation extends FrameLayout implements ValueAnimator.AnimatorUpdateListener, View.OnClickListener
 {
     LinearLayout layout;
@@ -54,13 +53,17 @@ public class BottomNavigation extends FrameLayout implements ValueAnimator.Anima
     private OnSelectionListener selectionListener;
 
 
-    public interface OnSelectionListener { void onSelection(int pos, BottomNavigationItem item); }
+    public interface OnSelectionListener
+    {
+        /** Called when an item of BottomNavigation is clicked */
+        void onSelection(int pos, BottomNavigationItem item);
+    }
 
     public enum CondensedMode
     {
-        None, // Show label and icon
-        Label, // Hide the label
-        Icon // Hide the icon
+        None,   // Show label and icon
+        Label,  // Hide the label
+        Icon    // Hide the icon
     }
 
 
@@ -89,7 +92,7 @@ public class BottomNavigation extends FrameLayout implements ValueAnimator.Anima
             defaultItemColor = a.getColor(R.styleable.BottomNavigation_defaultItemColor, defaultItemColor);
             selectedItemColor = a.getColor(R.styleable.BottomNavigation_selectedItemColor, selectedItemColor);
             condensedMode = resolveCondensedMode( a.getInteger(R.styleable.BottomNavigation_condensedMode, 0) );
-            
+
             cursorColor = a.getColor(R.styleable.BottomNavigation_cursorColor, selectedItemColor);
             cursorAnimDuration = a.getInt(R.styleable.BottomNavigation_cursorAnimDuration, cursorAnimDuration);
             cursorHeight = (int) a.getDimension(R.styleable.BottomNavigation_cursorHeight, cursorHeight);
@@ -98,10 +101,7 @@ public class BottomNavigation extends FrameLayout implements ValueAnimator.Anima
 
         setPadding(0, 0, 0, cursorHeight);
 
-        layout = new LinearLayout(context);
-        layout.setOrientation(LinearLayout.HORIZONTAL);
-        addView(layout, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-
+        initUI();
         initOutline();
         initGraphics();
         initAnimations();
@@ -109,8 +109,26 @@ public class BottomNavigation extends FrameLayout implements ValueAnimator.Anima
         // if is editor mode add some items to allow view styling
         if(isInEditMode()) buildTestItems();
     }
-    
-    
+
+    private void initUI()
+    {
+        layout = new LinearLayout(getContext());
+        layout.setOrientation(LinearLayout.HORIZONTAL);
+        addView(layout, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+    }
+
+    private void initOutline()
+    {
+        setOutlineProvider(new ViewOutlineProvider()
+        {
+            @Override
+            public void getOutline(View view, Outline outline)
+            {
+                outline.setRect(0, 0, getWidth(), getHeight());
+            }
+        });
+    }
+
     private void initGraphics()
     {
         cursorPaint = new Paint();
@@ -127,19 +145,7 @@ public class BottomNavigation extends FrameLayout implements ValueAnimator.Anima
         setupCursorAnimator(leftCursorAnimator);
     }
 
-    private void initOutline()
-    {
-        setOutlineProvider(new ViewOutlineProvider()
-        {
-            @Override
-            public void getOutline(View view, Outline outline)
-            {
-                outline.setRect(0, 0, getWidth(), getHeight());
-            }
-        });
-    }
-
-    // map an int used in the xml enum value to a real java enum
+    // Map the int value used in xml enum to a real java enum
     private CondensedMode resolveCondensedMode(int attrValue)
     {
         switch (attrValue)
@@ -153,7 +159,7 @@ public class BottomNavigation extends FrameLayout implements ValueAnimator.Anima
     }
 
     /** When a new item is being created it is passed to this function to setup static configurations.
-     *  For example: colors, condensed mode */
+     *  For example: colors, condensed mode, listeners */
     protected void setupItem(BottomNavigationItem item)
     {
         item.setDefaultColor(defaultItemColor);
@@ -171,7 +177,7 @@ public class BottomNavigation extends FrameLayout implements ValueAnimator.Anima
         animator.addUpdateListener(this);
     }
 
-    // Crate LayoutParams for an item
+    // Create LayoutParams for an item
     private ViewGroup.LayoutParams generateNavItemLayoutParams()
     {
         return new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT, 1);
@@ -198,6 +204,22 @@ public class BottomNavigation extends FrameLayout implements ValueAnimator.Anima
         super.onDraw(canvas);
         
         canvas.drawRect(cursorLeft, getHeight() - cursorHeight, cursorRight, (float) getHeight(), cursorPaint);
+    }
+
+    @Override
+    public void onAnimationUpdate(ValueAnimator animator)
+    {
+        if(animator.equals(leftCursorAnimator)) cursorLeft = (float) animator.getAnimatedValue();
+        else if(animator.equals(rightCursorAnimator)) cursorRight = (float) animator.getAnimatedValue();
+
+        invalidate();
+    }
+
+    @Override
+    public void onClick(View v)
+    {
+        final int index = layout.indexOfChild(v);
+        if(index != -1) selectItem(index, true);
     }
 
     // Teleport the cursor to the specified child position, cancelling animation
@@ -230,26 +252,11 @@ public class BottomNavigation extends FrameLayout implements ValueAnimator.Anima
         }
     }
 
-    @Override
-    public void onAnimationUpdate(ValueAnimator animator)
-    {
-        if(animator.equals(leftCursorAnimator)) cursorLeft = (float) animator.getAnimatedValue();
-        else if(animator.equals(rightCursorAnimator)) cursorRight = (float) animator.getAnimatedValue();
-
-        invalidate();
-    }
-
-    @Override
-    public void onClick(View v)
-    {
-        final int index = layout.indexOfChild(v);
-        if(index != -1) selectItem(index, true);
-    }
-
-    /** Select the item at the given position and call BottomViewSelectListener callback.
-     * @param pos The position of the item
-     * @param animate If should play cursor animations or not
-     * */
+    /**
+     * Select the item at the given position and call BottomViewSelectListener callback.
+     * @param pos       The position of the item
+     * @param animate   If should play cursor animations or not
+     */
     public void selectItem(int pos, boolean animate)
     {
         if(layout.getChildAt(pos) == null)
@@ -285,9 +292,11 @@ public class BottomNavigation extends FrameLayout implements ValueAnimator.Anima
         this.selectionListener = selectionListener;
     }
     
-    /** Add a new NavigationItem at the end of bar
+    /**
+     * Add a new NavigationItem at the end of bar
      * @param labelText Text of the item. If null a default value is used
-     * @param icon Icon of the item. If null a circle icon is used */
+     * @param icon      Icon of the item. If null a circle icon is used
+     */
     public void addNavigationItem(String labelText, Drawable icon)
     {
         BottomNavigationItem newItem = new BottomNavigationItem(getContext());
