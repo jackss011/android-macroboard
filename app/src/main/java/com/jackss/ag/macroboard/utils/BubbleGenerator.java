@@ -27,39 +27,45 @@ import android.view.animation.LinearInterpolator;
  */
 public class BubbleGenerator implements ValueAnimator.AnimatorUpdateListener
 {
-    // default values for variables
-    private static final int DEFAULT_DURATION = 200;
+    // Some predefined values
+    public final static int DURATION_LONG = 400;
+    public final static int DURATION_SHORT = 200;
+    public final static float OPACITY_LIGHT = 0.3f;
+    public final static float OPACITY_DARK = 0.6f;
+
+    // Default values for variables
     private static final float DEFAULT_MAX_RADIUS = 300.f;
-    private static final float DEFAULT_MAX_OPACITY = 0.3f;
     private static final int DEFAULT_BUBBLE_COLOR = Color.GRAY;
     private static final float DEFAULT_AUTORADIUS_MULTIPLIER = 1.3f;
 
-    // parent used to invalidate view when drawing is required
+    // Parent used to invalidate view when drawing is required
     private View parent;
 
-    // runtime variables
-    private float bubbleX, bubbleY, radius;
-
-    private ValueAnimator radiusAnimator;
-    private ValueAnimator opacityAnimator;
-
-    private Paint bubblePaint;
-
-    // runtime variables
+    // Runtime variables
+    private float bubbleX;
+    private float bubbleY;
+    private float radius;
     private int duration;
     private float maxRadius;
     private float maxOpacity;
     private int bubbleColor;
 
+    // Animators
+    private ValueAnimator radiusAnimator;
+    private ValueAnimator opacityAnimator;
+
+    // Draw paint
+    private Paint bubblePaint;
+
 
     public BubbleGenerator(@NonNull View parent)
     {
-        this(parent, DEFAULT_DURATION, DEFAULT_MAX_RADIUS);
+        this(parent, DURATION_SHORT, DEFAULT_MAX_RADIUS);
     }
 
     public BubbleGenerator(@NonNull View parent, int duration, float maxRadius)
     {
-        this(parent, duration, maxRadius, DEFAULT_MAX_OPACITY, DEFAULT_BUBBLE_COLOR);
+        this(parent, duration, maxRadius, OPACITY_DARK, DEFAULT_BUBBLE_COLOR);
     }
 
     public BubbleGenerator(@NonNull View parent, int duration, float maxRadius, float maxOpacity, int bubbleColor)

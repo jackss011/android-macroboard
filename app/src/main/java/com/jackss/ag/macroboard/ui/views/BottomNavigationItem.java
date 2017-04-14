@@ -80,7 +80,9 @@ public class BottomNavigationItem extends FrameLayout
 
     private void initHelpers()
     {
-        bubbleGenerator = new BubbleGenerator(this);
+        bubbleGenerator = new BubbleGenerator(this)
+                .setDuration(BubbleGenerator.DURATION_LONG)
+                .setMaxOpacity(BubbleGenerator.OPACITY_LIGHT);
         detector = new ButtonDetector(mButtonEventListener);
     }
 
