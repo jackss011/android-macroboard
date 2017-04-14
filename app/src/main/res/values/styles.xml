@@ -1,22 +1,38 @@
 <resources>
 
-    <!-- Base application theme. -->
+
+    <!-- Application -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+
     <!-- Toolbar title text -->
     <style name="ToolbarTitle" parent="@android:style/TextAppearance.Material.WindowTitle">
         <item name="android:textColor">#FFFFFF</item>
     </style>
 
-    <style name="MyBase">
 
+    <!--Dividers-->
+    <style name="Divider">
+        <item name="android:background">@color/colorDivider</item>
     </style>
 
-    <style name="BottomNavigation" parent="MyBase">
+    <style name="Divider.Horizontal">
+        <item name="android:layout_height">@dimen/divider_size</item>
+        <item name="android:layout_width">match_parent</item>
+    </style>
+
+    <style name="Divider.Vertical">
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:layout_width">@dimen/divider_size</item>
+    </style>
+
+
+    <!--BottomNavigation-->
+    <style name="BottomNavigation">
         <item name="android:background">@color/bNav_background</item>
         <item name="defaultItemColor">@color/bNav_item</item>
         <item name="selectedItemColor">@color/nNav_itemSel</item>
@@ -29,7 +45,9 @@
         <item name="condensedMode">label</item>
     </style>
 
-    <style name="Knob" parent="MyBase">
+
+    <!--Knob-->
+    <style name="Knob">
         <item name="backgroundRadius">2dp</item>
         <item name="circleColor">#cacaca</item>
         <item name="strokeColor">#555</item>
@@ -40,11 +58,15 @@
         <item name="android:elevation">1dp</item>
     </style>
 
-    <style name="Trackpad" parent="MyBase">
+
+    <!--Trackpad-->
+    <style name="Trackpad">
         <item name="android:elevation">1dp</item>
     </style>
 
-    <style name="MaterialButton" parent="MyBase">
+
+    <!--MaterialButton-->
+    <style name="MaterialButton">
         <item name="backgroundColor">@color/colorAccent</item>
         <item name="android:elevation">2dp</item>
     </style>
@@ -53,5 +75,6 @@
         <item name="iconSrc">@drawable/bni_dummy_icon</item>
         <item name="backgroundSaturationMultiplier">0.87</item>
     </style>
-    
+
+
 </resources>
