@@ -139,7 +139,6 @@ public class BubbleGenerator implements ValueAnimator.AnimatorUpdateListener
     public BubbleGenerator setDuration(int duration)
     {
         this.duration = duration;
-
         radiusAnimator.setDuration(this.duration);
         opacityAnimator.setDuration(this.duration);
 
@@ -149,7 +148,6 @@ public class BubbleGenerator implements ValueAnimator.AnimatorUpdateListener
     public BubbleGenerator setMaxRadius(float maxRadius)
     {
         this.maxRadius = maxRadius;
-
         radiusAnimator.setFloatValues(0.f, this.maxRadius);
 
         return this;
@@ -158,7 +156,6 @@ public class BubbleGenerator implements ValueAnimator.AnimatorUpdateListener
     public BubbleGenerator setMaxOpacity(float maxOpacity)
     {
         this.maxOpacity = maxOpacity;
-
         opacityAnimator.setFloatValues(this.maxOpacity, 0.f);
 
         return this;
@@ -167,7 +164,6 @@ public class BubbleGenerator implements ValueAnimator.AnimatorUpdateListener
     public BubbleGenerator setBubbleColor(int color)
     {
         this.bubbleColor = color;
-
         if(bubblePaint != null) bubblePaint.setColor(this.bubbleColor);
 
         return this;

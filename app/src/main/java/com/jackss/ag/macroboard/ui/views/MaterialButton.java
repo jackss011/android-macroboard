@@ -6,19 +6,19 @@ import android.graphics.*;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
-import android.util.Log;
-import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewOutlineProvider;
 import com.jackss.ag.macroboard.R;
 import com.jackss.ag.macroboard.utils.BubbleGenerator;
 import com.jackss.ag.macroboard.utils.MBUtils;
+import com.jackss.ag.macroboard.utils.ViewLifter;
 
 /**
  * Cool button
  *
  */
-public class MaterialButton extends View
+public class MaterialButton extends View implements ButtonDetector.OnButtonEventListener
 {
     private static final String TAG = "MaterialButton";
 
@@ -35,7 +35,8 @@ public class MaterialButton extends View
     int iconSize = MBUtils.dp2px(24);
 
     BubbleGenerator bubbleGenerator;
-    GestureDetector gestureDetector;
+    ViewLifter lifter;
+    ButtonDetector detector;
 
 
     public MaterialButton(Context context) { this(context, null); }
@@ -60,20 +61,16 @@ public class MaterialButton extends View
 
         if(icon == null) icon = getResources().getDrawable(R.drawable.ic_test_icon, null);
 
-        gestureDetector = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener()
-        {
-            @Override
-            public boolean onSingleTapUp(MotionEvent e)
-            {
-                if (bubbleGenerator != null) bubbleGenerator.generateBubble(e.getX(), e.getY());
-                return false;
-            }
-        });
-        bubbleGenerator = new BubbleGenerator(this);
-        bubbleGenerator.setBubbleColor(Color.DKGRAY);
-        bubbleGenerator.setMaxOpacity(0.6f);
+        bubbleGenerator = new BubbleGenerator(this)
+            .setBubbleColor(Color.GRAY)
+            .setMaxOpacity(0.3f)
+            .setDuration(400);
+
+        lifter = new ViewLifter(this, 4);
+        detector = new ButtonDetector(this, 200);
 
         initGraphics();
+        initOutline();
     }
 
 
@@ -130,7 +127,7 @@ public class MaterialButton extends View
     @Override
     public boolean onTouchEvent(MotionEvent event)
     {
-        gestureDetector.onTouchEvent(event);
+        detector.onTouchEvent(event);
 
         return super.onTouchEvent(event);
     }
@@ -140,5 +137,44 @@ public class MaterialButton extends View
         backgroundPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         backgroundPaint.setStyle(Paint.Style.FILL);
         backgroundPaint.setColor(backgroundColor);
+    }
+
+    private void initOutline()
+    {
+        setOutlineProvider(new ViewOutlineProvider()
+        {
+            @Override
+            public void getOutline(View view, Outline outline)
+            {
+                Rect bounds = new Rect();
+                backgroundRect.round(bounds);
+                outline.setRoundRect(bounds, cornerRadius);
+            }
+        });
+    }
+
+    @Override
+    public void onDown(float x, float y)
+    {
+        lifter.raise();
+    }
+
+    @Override
+    public void onUp(float x, float y)
+    {
+        lifter.drop();
+    }
+
+    @Override
+    public void onTap(float x, float y)
+    {
+        lifter.drop();
+        bubbleGenerator.generateBubble(x, y);
+    }
+
+    @Override
+    public void onCancel()
+    {
+        lifter.cancel();
     }
 }
