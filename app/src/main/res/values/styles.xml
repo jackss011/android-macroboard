@@ -12,11 +12,7 @@
         <item name="android:textColor">#FFFFFF</item>
     </style>
 
-    <style name="MyBase">
-
-    </style>
-
-    <style name="BottomNavigation" parent="MyBase">
+    <style name="BottomNavigation">
         <item name="android:background">@color/bNav_background</item>
         <item name="defaultItemColor">@color/bNav_item</item>
         <item name="selectedItemColor">@color/nNav_itemSel</item>
@@ -29,7 +25,7 @@
         <item name="condensedMode">label</item>
     </style>
 
-    <style name="Knob" parent="MyBase">
+    <style name="Knob">
         <item name="backgroundRadius">2dp</item>
         <item name="circleColor">#cacaca</item>
         <item name="strokeColor">#555</item>
@@ -40,11 +36,11 @@
         <item name="android:elevation">1dp</item>
     </style>
 
-    <style name="Trackpad" parent="MyBase">
+    <style name="Trackpad">
         <item name="android:elevation">1dp</item>
     </style>
 
-    <style name="MaterialButton" parent="MyBase">
+    <style name="MaterialButton">
         <item name="backgroundColor">@color/colorAccent</item>
         <item name="android:elevation">2dp</item>
     </style>
