@@ -1,13 +1,16 @@
 package com.jackss.ag.macroboard.utils;
 
+import android.animation.TimeInterpolator;
 import android.animation.ValueAnimator;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.support.annotation.NonNull;
 import android.view.View;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.LinearInterpolator;
-import android.support.annotation.NonNull;
+
+import java.sql.Time;
 
 /**
  * Utility class used to draw color bubbles on custom views
@@ -166,6 +169,18 @@ public class BubbleGenerator implements ValueAnimator.AnimatorUpdateListener
         this.bubbleColor = color;
         if(bubblePaint != null) bubblePaint.setColor(this.bubbleColor);
 
+        return this;
+    }
+
+    public BubbleGenerator setRadiusInterpolator(@NonNull TimeInterpolator interpolator)
+    {
+        radiusAnimator.setInterpolator(interpolator);
+        return this;
+    }
+
+    public BubbleGenerator setOpacityInterpolator(@NonNull TimeInterpolator interpolator)
+    {
+        opacityAnimator.setInterpolator(interpolator);
         return this;
     }
 
