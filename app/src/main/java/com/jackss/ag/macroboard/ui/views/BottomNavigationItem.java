@@ -127,8 +127,8 @@ public class BottomNavigationItem extends FrameLayout
 
     private void initDefaultValues()
     {
-        setIconDrawableById(R.drawable.bni_dummy_icon);
-        setLabelTextById(R.string.bni_dummy_text);
+        setIconDrawable(R.drawable.bni_dummy_icon);
+        setLabelText(R.string.bni_dummy_text);
     }
 
     // Called when this item need to update his colors.
@@ -153,7 +153,7 @@ public class BottomNavigationItem extends FrameLayout
     }
 
     /** Set label text using a string resource */
-    public void setLabelTextById(@StringRes int resId)
+    public void setLabelText(@StringRes int resId)
     {
         if(label != null) setLabelText(getContext().getResources().getString(resId));
     }
@@ -165,12 +165,9 @@ public class BottomNavigationItem extends FrameLayout
     }
 
     /** Set icon using a drawable resource */
-    public void setIconDrawableById(@DrawableRes int resId)
+    public void setIconDrawable(@DrawableRes int resId)
     {
-        if(icon != null)
-        {
-            setIconDrawable(getContext().getResources().getDrawable(resId, null));
-        }
+        if(icon != null) setIconDrawable(getContext().getResources().getDrawable(resId, null));
     }
 
     /** Condensed mode allow to save space hiding the label or the icon */
