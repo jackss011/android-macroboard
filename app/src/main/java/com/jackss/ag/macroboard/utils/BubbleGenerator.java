@@ -24,6 +24,7 @@ public class BubbleGenerator implements ValueAnimator.AnimatorUpdateListener
     private static final float DEFAULT_MAX_RADIUS = 300.f;
     private static final float DEFAULT_MAX_OPACITY = 0.3f;
     private static final int DEFAULT_BUBBLE_COLOR = Color.GRAY;
+    private static final float DEFAULT_AUTORADIUS_MULTIPLIER = 1.3f;
 
     // parent used to invalidate view when drawing is required
     private View parent;
@@ -190,7 +191,7 @@ public class BubbleGenerator implements ValueAnimator.AnimatorUpdateListener
         if(parent != null)
         {
             final float diagonal = (float) Math.sqrt(Math.pow(parent.getWidth(), 2.f) + Math.pow(parent.getHeight(), 2.f)) / 2;
-            setMaxRadius(1.3f * diagonal); // slightly increase diagonal radius
+            setMaxRadius(DEFAULT_AUTORADIUS_MULTIPLIER * diagonal); // slightly increase diagonal radius
         }
 
         return this;
