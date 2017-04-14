@@ -145,10 +145,10 @@ public class MaterialButton extends View
 
     private void initHelpers()
     {
-        bubbleGenerator = new BubbleGenerator(this)  //TODO: hardcoded values
+        bubbleGenerator = new BubbleGenerator(this)  //TODO: maybe use xml attributes
                 .setBubbleColor(Color.DKGRAY)
-                .setMaxOpacity(0.3f)
-                .setDuration(400);
+                .setMaxOpacity(BubbleGenerator.OPACITY_LIGHT)
+                .setDuration(BubbleGenerator.DURATION_LONG);
 
         detector = new ButtonDetector(mButtonEventListener, ButtonDetector.DEFAULT_TAP_DURATION);
         lifter = new ViewLifter(this).setLifterUpdateListener(mLifterUpdateListener);
