@@ -10,10 +10,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewOutlineProvider;
 import com.jackss.ag.macroboard.R;
-import com.jackss.ag.macroboard.utils.BubbleGenerator;
-import com.jackss.ag.macroboard.utils.CachedArgbEvaluator;
-import com.jackss.ag.macroboard.utils.MBUtils;
-import com.jackss.ag.macroboard.utils.ViewLifter;
+import com.jackss.ag.macroboard.utils.*;
 
 /**
  * Cool button
@@ -81,7 +78,7 @@ public class MaterialButton extends View implements ButtonDetector.OnButtonEvent
         finally { a.recycle(); }
 
         if(icon == null) icon = getResources().getDrawable(R.drawable.ic_test_icon, null);
-        
+
         backgroundPressedColor = MBUtils.saturateColor(backgroundColor, 0.85f);
         backgroundColorEvaluator = new CachedArgbEvaluator(backgroundColor, backgroundPressedColor);
 

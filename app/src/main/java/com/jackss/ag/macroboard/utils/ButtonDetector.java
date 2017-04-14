@@ -1,4 +1,4 @@
-package com.jackss.ag.macroboard.ui.views;
+package com.jackss.ag.macroboard.utils;
 
 import android.view.MotionEvent;
 
