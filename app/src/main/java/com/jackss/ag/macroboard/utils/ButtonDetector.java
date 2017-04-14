@@ -9,7 +9,7 @@ import android.view.MotionEvent;
  */
 public class ButtonDetector
 {
-    interface OnButtonEventListener
+    public interface OnButtonEventListener
     {
         /** First finger down */
         void onDown(float x, float y);
@@ -24,7 +24,7 @@ public class ButtonDetector
         void onCancel();
     }
 
-    OnButtonEventListener listener;
+    private OnButtonEventListener listener;
 
     private long downStamp = -1;
 

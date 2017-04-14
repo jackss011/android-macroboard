@@ -36,6 +36,7 @@
     <declare-styleable name="MaterialButton">
         <attr name="backgroundColor"/>
         <attr name="iconSrc" format="reference"/>
+        <attr name="backgroundColorSaturation" format="float"/>
     </declare-styleable>
 
 </resources>

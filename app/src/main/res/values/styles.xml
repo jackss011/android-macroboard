@@ -51,6 +51,7 @@
 
     <style name="MaterialButton.Cut">
         <item name="iconSrc">@drawable/bni_dummy_icon</item>
+        <item name="backgroundColorSaturation">0.87</item>
     </style>
     
 </resources>

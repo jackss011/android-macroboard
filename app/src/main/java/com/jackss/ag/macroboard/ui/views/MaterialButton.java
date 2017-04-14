@@ -31,6 +31,7 @@ public class MaterialButton extends View implements ButtonDetector.OnButtonEvent
     int backgroundColor = Color.GRAY;
     float cornerRadius = MBUtils.dp2px(2);
     int iconSize = MBUtils.dp2px(24);
+    float backgroundColorSaturation = 0.85f;
 
     int backgroundPressedColor = Color.DKGRAY;
     CachedArgbEvaluator backgroundColorEvaluator;
@@ -74,12 +75,13 @@ public class MaterialButton extends View implements ButtonDetector.OnButtonEvent
         {
             backgroundColor = a.getColor(R.styleable.MaterialButton_backgroundColor, backgroundColor);
             icon = a.getDrawable(R.styleable.MaterialButton_iconSrc);
+            backgroundColorSaturation = a.getFloat(R.styleable.MaterialButton_backgroundColorSaturation, backgroundColorSaturation);
         }
         finally { a.recycle(); }
 
         if(icon == null) icon = getResources().getDrawable(R.drawable.ic_test_icon, null);
 
-        backgroundPressedColor = MBUtils.saturateColor(backgroundColor, 0.85f);
+        backgroundPressedColor = MBUtils.saturateColor(backgroundColor, backgroundColorSaturation);
         backgroundColorEvaluator = new CachedArgbEvaluator(backgroundColor, backgroundPressedColor);
 
         bubbleGenerator = new BubbleGenerator(this)
