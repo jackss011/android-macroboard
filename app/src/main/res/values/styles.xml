@@ -15,6 +15,22 @@
     </style>
 
 
+    <!--Dividers-->
+    <style name="Divider">
+        <item name="android:background">@color/colorDivider</item>
+    </style>
+
+    <style name="Divider.Horizontal">
+        <item name="android:layout_height">@dimen/divider_size</item>
+        <item name="android:layout_width">match_parent</item>
+    </style>
+
+    <style name="Divider.Vertical">
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:layout_width">@dimen/divider_size</item>
+    </style>
+
+
     <!--BottomNavigation-->
     <style name="BottomNavigation">
         <item name="android:background">@color/bNav_background</item>
