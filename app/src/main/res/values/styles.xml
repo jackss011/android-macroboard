@@ -1,17 +1,21 @@
 <resources>
 
-    <!-- Base application theme. -->
+
+    <!-- Application -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+
     <!-- Toolbar title text -->
     <style name="ToolbarTitle" parent="@android:style/TextAppearance.Material.WindowTitle">
         <item name="android:textColor">#FFFFFF</item>
     </style>
 
+
+    <!--BottomNavigation-->
     <style name="BottomNavigation">
         <item name="android:background">@color/bNav_background</item>
         <item name="defaultItemColor">@color/bNav_item</item>
@@ -25,6 +29,8 @@
         <item name="condensedMode">label</item>
     </style>
 
+
+    <!--Knob-->
     <style name="Knob">
         <item name="backgroundRadius">2dp</item>
         <item name="circleColor">#cacaca</item>
@@ -36,10 +42,14 @@
         <item name="android:elevation">1dp</item>
     </style>
 
+
+    <!--Trackpad-->
     <style name="Trackpad">
         <item name="android:elevation">1dp</item>
     </style>
 
+
+    <!--MaterialButton-->
     <style name="MaterialButton">
         <item name="backgroundColor">@color/colorAccent</item>
         <item name="android:elevation">2dp</item>
@@ -49,5 +59,6 @@
         <item name="iconSrc">@drawable/bni_dummy_icon</item>
         <item name="backgroundSaturationMultiplier">0.87</item>
     </style>
-    
+
+
 </resources>
