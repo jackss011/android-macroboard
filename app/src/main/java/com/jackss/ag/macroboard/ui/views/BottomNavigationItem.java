@@ -8,7 +8,6 @@ import android.support.annotation.DrawableRes;
 import android.support.annotation.StringRes;
 import android.util.AttributeSet;
 import android.util.TypedValue;
-import android.view.GestureDetector;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.ViewGroup;
@@ -18,6 +17,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import com.jackss.ag.macroboard.R;
 import com.jackss.ag.macroboard.utils.BubbleGenerator;
+import com.jackss.ag.macroboard.utils.ButtonDetector;
 import com.jackss.ag.macroboard.utils.MBUtils;
 
 
@@ -25,9 +25,7 @@ import com.jackss.ag.macroboard.utils.MBUtils;
  *  Item used in BottomNavigation.
  *
  *  Nothing should be called on this class, use BottomNavigation methods instead.
- *
  */
-
 public class BottomNavigationItem extends FrameLayout
 {
     private LinearLayout layout;
@@ -35,23 +33,28 @@ public class BottomNavigationItem extends FrameLayout
     private TextView label;
 
     private BubbleGenerator bubbleGenerator;
-    private GestureDetector detector;
-
-    // Generate a bubble on tap
-    private GestureDetector.OnGestureListener gestureListener = new GestureDetector.SimpleOnGestureListener()
-    {
-        @Override
-        public boolean onSingleTapUp(MotionEvent e)
-        {
-            if(bubbleGenerator != null) bubbleGenerator.generateBubble(e.getX(), e.getY());
-            return false;
-        }
-    };
+    private ButtonDetector detector;
 
     private int selectedColor = Color.BLUE;
     private int defaultColor = Color.GRAY;
 
-    private BottomNavigation.CondensedMode condensedMode = BottomNavigation.CondensedMode.None;
+
+    private ButtonDetector.OnButtonEventListener mButtonEventListener = new ButtonDetector.OnButtonEventListener()
+    {
+        @Override
+        public void onDown(float x, float y) {}
+        @Override
+        public void onTap(float x, float y) {}
+        @Override
+        public void onCancel() {}
+
+        @Override
+        public void onUp(float x, float y)
+        {
+            bubbleGenerator.generateBubble(x, y);
+            performClick();
+        }
+    };
 
 
     public BottomNavigationItem(Context context)
@@ -63,14 +66,44 @@ public class BottomNavigationItem extends FrameLayout
     {
         super(context, attrs);
 
-        bubbleGenerator = new BubbleGenerator(this);
-        detector = new GestureDetector(context, gestureListener);
-
         setSoundEffectsEnabled(false);
 
-        buildUI(context);
+        initHelpers();
+        initUI();
+        initDefaultValues();
     }
 
+
+    private void initHelpers()
+    {
+        bubbleGenerator = new BubbleGenerator(this);
+        detector = new ButtonDetector(mButtonEventListener);
+    }
+
+    private void initUI()
+    {
+        layout = new LinearLayout(getContext());
+        layout.setOrientation(LinearLayout.VERTICAL);
+        layout.setPadding(0, MBUtils.dp2px(6), 0, MBUtils.dp2px(6));
+
+        icon = new ImageView(getContext());
+
+        label = new TextView(getContext());
+        label.setGravity(Gravity.BOTTOM);
+        label.setTextAlignment(TEXT_ALIGNMENT_CENTER);
+        label.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+
+        layout.addView(icon, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, MBUtils.dp2px(24)));
+        layout.addView(label, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+
+        addView(layout, new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+    }
+
+    private void initDefaultValues()
+    {
+        setIconDrawable(R.drawable.bni_dummy_icon);
+        setLabelText(R.string.bni_dummy_text);
+    }
 
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom)
@@ -101,34 +134,7 @@ public class BottomNavigationItem extends FrameLayout
     {
         detector.onTouchEvent(event);
 
-        return super.onTouchEvent(event);
-    }
-
-    private void buildUI(Context context)
-    {
-        layout = new LinearLayout(context);
-        layout.setOrientation(LinearLayout.VERTICAL);
-        layout.setPadding(0, MBUtils.dp2px(6), 0, MBUtils.dp2px(6));
-
-        icon = new ImageView(context);
-
-        label = new TextView(context);
-        label.setGravity(Gravity.BOTTOM);
-        label.setTextAlignment(TEXT_ALIGNMENT_CENTER);
-        label.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
-
-        initDefaultValues();
-
-        layout.addView(icon, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, MBUtils.dp2px(24)));
-        layout.addView(label, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-
-        addView(layout, new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-    }
-
-    private void initDefaultValues()
-    {
-        setIconDrawable(R.drawable.bni_dummy_icon);
-        setLabelText(R.string.bni_dummy_text);
+        return true;
     }
 
     // Called when this item need to update his colors.
@@ -142,8 +148,10 @@ public class BottomNavigationItem extends FrameLayout
     /** Get current color ued for label and icon */
     public int getCurrentColor()
     {
-        if(isSelected()) return selectedColor;
-        else return defaultColor;
+        if(isSelected())
+            return selectedColor;
+        else
+            return defaultColor;
     }
 
     /** Set label text for this item */
@@ -173,8 +181,6 @@ public class BottomNavigationItem extends FrameLayout
     /** Condensed mode allow to save space hiding the label or the icon */
     public void setCondensedMode(BottomNavigation.CondensedMode condensedMode)
     {
-        this.condensedMode = condensedMode;
-
         switch (condensedMode)
         {
             case None:
