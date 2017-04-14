@@ -28,6 +28,10 @@ import com.jackss.ag.macroboard.utils.MBUtils;
  */
 public class BottomNavigationItem extends FrameLayout
 {
+    private final static int OUTER_PADDING_DP = 6;
+    private final static int TEXT_SIZE_SP = 12;
+    private final static int ICON_SIZE_DP = 24;
+
     private LinearLayout layout;
     private ImageView icon;
     private TextView label;
@@ -84,16 +88,16 @@ public class BottomNavigationItem extends FrameLayout
     {
         layout = new LinearLayout(getContext());
         layout.setOrientation(LinearLayout.VERTICAL);
-        layout.setPadding(0, MBUtils.dp2px(6), 0, MBUtils.dp2px(6));
+        layout.setPadding(0, MBUtils.dp2px(OUTER_PADDING_DP), 0, MBUtils.dp2px(OUTER_PADDING_DP));
 
         icon = new ImageView(getContext());
 
         label = new TextView(getContext());
         label.setGravity(Gravity.BOTTOM);
         label.setTextAlignment(TEXT_ALIGNMENT_CENTER);
-        label.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+        label.setTextSize(TypedValue.COMPLEX_UNIT_SP, TEXT_SIZE_SP);
 
-        layout.addView(icon, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, MBUtils.dp2px(24)));
+        layout.addView(icon, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, MBUtils.dp2px(ICON_SIZE_DP)));
         layout.addView(label, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
 
         addView(layout, new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
