@@ -36,7 +36,7 @@ public class TrackpadView extends View
         try
         {
             baseColor = a.getColor(R.styleable.TrackpadView_baseColor, baseColor);
-            borderRadius = a.getDimension(R.styleable.TrackpadView_baseColor, borderRadius);
+            borderRadius = a.getDimension(R.styleable.TrackpadView_borderRadius, borderRadius);
         }
         finally { a.recycle(); }
 
