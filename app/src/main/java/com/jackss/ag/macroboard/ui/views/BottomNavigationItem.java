@@ -28,7 +28,8 @@ import com.jackss.ag.macroboard.utils.MBUtils;
  */
 public class BottomNavigationItem extends FrameLayout
 {
-    private final static int OUTER_PADDING_DP = 6;
+    private final static int TOP_PADDING_DP = 5;
+    private final static int BOTTOM_PADDING_DP = 2;
     private final static int TEXT_SIZE_SP = 12;
     private final static int ICON_SIZE_DP = 24;
 
@@ -90,7 +91,7 @@ public class BottomNavigationItem extends FrameLayout
     {
         layout = new LinearLayout(getContext());
         layout.setOrientation(LinearLayout.VERTICAL);
-        layout.setPadding(0, MBUtils.dp2px(OUTER_PADDING_DP), 0, MBUtils.dp2px(OUTER_PADDING_DP));
+        layout.setPadding(0, MBUtils.dp2px(TOP_PADDING_DP), 0, MBUtils.dp2px(BOTTOM_PADDING_DP));
 
         icon = new ImageView(getContext());
 

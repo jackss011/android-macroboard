@@ -36,7 +36,7 @@
         <item name="android:background">@color/bNav_background</item>
         <item name="defaultItemColor">@color/bNav_item</item>
         <item name="selectedItemColor">@color/nNav_itemSel</item>
-        <item name="cursorHeight">4dp</item>
+        <item name="cursorHeight">2dp</item>
         <item name="cursorAnimDuration">100</item>
         <item name="android:elevation">6dp</item>
     </style>
