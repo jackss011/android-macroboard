@@ -11,6 +11,7 @@ import android.view.View;
 import android.widget.Button;
 import com.jackss.ag.macroboard.R;
 import com.jackss.ag.macroboard.network.Beacon;
+import com.jackss.ag.macroboard.network.TcpConnection;
 import com.jackss.ag.macroboard.network.UdpSender;
 
 import java.net.InetAddress;
@@ -45,6 +46,9 @@ public class MainActivity extends AppCompatActivity
             e.printStackTrace();
         }
 
+        final TcpConnection connection = new TcpConnection();
+        connection.accept(4545);
+
         Button start = (Button) findViewById(R.id.btn_media_prev);
         start.setOnClickListener(new View.OnClickListener()
         {
@@ -72,6 +76,7 @@ public class MainActivity extends AppCompatActivity
             public void onClick(View v)
             {
                 sender.sendData(address, 4545,"Hey dummy");
+                connection.sendData("Hello");
             }
         });
     }
