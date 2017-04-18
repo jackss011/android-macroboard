@@ -63,6 +63,9 @@ public class TcpConnection
         void onConnectionState(int state);
     }
 
+    /**
+     * AsyncTask used to produce a connected TCP socket
+     */
     private class ConnectionTask extends AsyncTask<Integer, Void, Socket>
     {
         @Override
@@ -89,7 +92,11 @@ public class TcpConnection
             if(!isCancelled()) onConnectionResult(socket);
         }
     }
-    
+
+    /**
+     * Runnable running on a separate thread listening for TCP input stream data.
+     * Data is sent to main_thread via Handler(main_looper)
+     */
     private class InputHandler  implements Runnable
     {
         private Handler mainHandler;
@@ -222,11 +229,6 @@ public class TcpConnection
         return clientSocket != null && clientSocket.isConnected();
     }
 
-    public void setTcpListener(OnTcpListener listener)
-    {
-        this.listener = listener;
-    }
-
     public void accept()
     {
         if(!isConnecting())
@@ -283,6 +285,11 @@ public class TcpConnection
                 throw new AssertionError("outputPrinter is null while the socket is connected!");
         }
         else Log.e(TAG, "socket is not connected");
+    }
+
+    public void setTcpListener(OnTcpListener listener)
+    {
+        this.listener = listener;
     }
 }
 
