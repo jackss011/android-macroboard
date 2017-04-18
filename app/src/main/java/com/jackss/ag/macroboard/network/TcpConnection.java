@@ -1,9 +1,6 @@
 package com.jackss.ag.macroboard.network;
 
-import android.os.AsyncTask;
-import android.os.Handler;
-import android.os.Looper;
-import android.os.Message;
+import android.os.*;
 import android.util.Log;
 
 import java.io.*;
@@ -18,19 +15,46 @@ public class TcpConnection
 {
     private static final String TAG = "TcpConnection";
 
-    private static final int WHAT_DATA = 200;
-    private static final int WHAT_ERROR = 400;
 
+    // Used in handler messages what field
+    private static final int MSG_WHAT_DATA = 200;
+    private static final int MSG_WHAT_ERROR = 400;
+
+
+    // TCP connection socket
     private Socket clientSocket;
 
-    private OnTcpListener listener;
-
+    // AsyncTask used to produce a connected socket
     private ConnectionTask connectionTask;
 
+    // Thread listening for input_stream data
     private Thread inputThread;
 
+    // Printer used to send data to the output_stream
     private PrintWriter outputPrinter;
 
+
+    // Port used for the tcp connection
+    private int port;
+
+    // Listener used to listen for connection changes
+    private OnTcpListener listener;
+
+
+
+    //
+    // ========== CONSTRUCTOR ===========
+    //
+
+    public TcpConnection(int port)
+    {
+        this.port = port;
+    }
+
+
+    //
+    // ========== INNER CLASSES ===========
+    //
 
     public interface OnTcpListener
     {
@@ -39,7 +63,7 @@ public class TcpConnection
         void onConnectionState(int state);
     }
 
-    class ConnectionTask extends AsyncTask<Integer, Void, Socket>
+    private class ConnectionTask extends AsyncTask<Integer, Void, Socket>
     {
         @Override
         protected Socket doInBackground(Integer... portArgs)
@@ -83,17 +107,15 @@ public class TcpConnection
                 @Override
                 public void handleMessage(Message msg)
                 {
-                    // MAIN THREAD HERE
+                    // RUNNING ON MAIN THREAD
                     switch(msg.what)
                     {
-                        case WHAT_DATA:
-                            String data = (String) msg.obj;
-                            Log.v(TAG, "On main thread data: " + data);
+                        case MSG_WHAT_DATA:
+                            onDataReceived((String) msg.obj);
                             break;
 
-                        case WHAT_ERROR:
-                            Log.e(TAG, "Tcp connection error");
-                            Log.v(TAG, String.valueOf(clientSocket.isConnected()));
+                        case MSG_WHAT_ERROR:
+                            onError();
                             break;
                     }
                 }
@@ -108,21 +130,21 @@ public class TcpConnection
             try
             {
                 BufferedReader br = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-                Log.v(TAG, "Started input thread");
+                Log.i(TAG, "Started input thread");
 
                 while(true)
                 {
                     if(Thread.interrupted()) break;
-
                     String readData = br.readLine();
+                    if(Thread.interrupted()) break;
+
                     if(readData != null)
                     {
-                        Log.v(TAG, "Read line: " + readData);
-                        mainHandler.obtainMessage(0, readData).sendToTarget();
+                        mainHandler.obtainMessage(MSG_WHAT_DATA, readData).sendToTarget();
                     }
                     else 
                     {
-                        mainHandler.sendEmptyMessage(WHAT_ERROR);
+                        mainHandler.sendEmptyMessage(MSG_WHAT_ERROR);
                     }
                 }
             }
@@ -132,12 +154,19 @@ public class TcpConnection
             }
             finally
             {
-                Log.v(TAG, String.valueOf(clientSocket.isClosed()));
-                mainHandler.sendEmptyMessage(WHAT_ERROR);
+                if(!Thread.interrupted())
+                    mainHandler.sendEmptyMessage(MSG_WHAT_ERROR);
+                else
+                    Log.i(TAG, "Skipping MGS_WHAT_ERROR since input_thread has been interrupted");
             }
         }
     }
 
+
+
+    //
+    // ========== METHODS ===========
+    //
 
     private void onConnectionResult(Socket socket)
     {
@@ -148,12 +177,12 @@ public class TcpConnection
         {
             onConnected();
         }
-        else Log.e(TAG, "Connection failed");
+        else Log.e(TAG, "Connection result: failed");
     }
 
     private void onConnected()
     {
-        Log.v(TAG, "Connected to: " + clientSocket.getInetAddress().getHostAddress());
+        Log.i(TAG, "Connected to: " + clientSocket.getInetAddress().getHostAddress());
 
         try
         {
@@ -171,9 +200,14 @@ public class TcpConnection
         }
     }
 
-    private boolean isConnected()
+    private void onError()
     {
-        return clientSocket != null && clientSocket.isConnected();
+        Log.e(TAG, "Connection error");
+    }
+
+    private void onDataReceived(String data)
+    {
+        Log.v(TAG, "Tcp data: " + data);
     }
 
     private boolean isConnecting()
@@ -183,24 +217,60 @@ public class TcpConnection
                 && !connectionTask.isCancelled();                               // task not cancelled
     }
 
+    private boolean isConnected()
+    {
+        return clientSocket != null && clientSocket.isConnected();
+    }
+
     public void setTcpListener(OnTcpListener listener)
     {
         this.listener = listener;
     }
 
-    public void accept(int port)
+    public void accept()
     {
         if(!isConnecting())
         {
             connectionTask = new ConnectionTask();
             connectionTask.execute(port);
-            Log.v(TAG, "Task started");
+            Log.i(TAG, "Connecting...");
         }
     }
 
-    public void disconnect()
+    public void reset()
     {
+        Log.v(TAG, "Connection reset");
 
+        // connection task
+        if(connectionTask != null)
+        {
+            connectionTask.cancel(true);
+            connectionTask = null;
+        }
+
+        // input thread
+        if(inputThread != null)
+        {
+            inputThread.interrupt();
+            inputThread = null;
+        }
+
+        // output printer
+        outputPrinter = null;
+
+        // client socket
+        if(clientSocket != null) try
+        {
+            clientSocket.close();
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+        finally
+        {
+            clientSocket = null;
+        }
     }
 
     public void sendData(String data)
@@ -216,43 +286,3 @@ public class TcpConnection
     }
 }
 
-
-
-
-
-
-
-
-
-
-// class OutputHandler implements Runnable
-// {
-//     final Socket socket;
-//
-//     Handler handler;
-//
-//     OutputHandler(Socket socket)
-//     {
-//         this.socket = socket;
-//     }
-//
-//     @Override
-//     public void run()
-//     {
-//         Looper.prepare();
-//
-//         handler = new Handler()
-//         {
-//             @Override
-//             public void handleMessage(Message msg)
-//             {
-//
-//             }
-//         };
-//
-//
-//
-//
-//         Looper.loop();
-//     }
-// }

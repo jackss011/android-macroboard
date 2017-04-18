@@ -46,8 +46,8 @@ public class MainActivity extends AppCompatActivity
             e.printStackTrace();
         }
 
-        final TcpConnection connection = new TcpConnection();
-        connection.accept(4545);
+        final TcpConnection connection = new TcpConnection(4545);
+        connection.accept();
 
         Button start = (Button) findViewById(R.id.btn_media_prev);
         start.setOnClickListener(new View.OnClickListener()
