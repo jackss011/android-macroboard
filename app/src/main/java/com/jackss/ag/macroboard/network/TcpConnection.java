@@ -4,8 +4,10 @@ import android.os.*;
 import android.util.Log;
 
 import java.io.*;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+
 
 /**
  * Manages a TCP connection
@@ -21,24 +23,20 @@ public class TcpConnection
     private static final int MSG_WHAT_ERROR = 400;
 
 
-    // TCP connection socket
     private Socket clientSocket;
 
-    // AsyncTask used to produce a connected socket
-    private ConnectionTask connectionTask;
+    private ConnectionTask connectionTask;      // AsyncTask used to produce a connected socket
 
-    // Thread listening for input_stream data
-    private Thread inputThread;
+    private Thread inputThread;                 // Thread listening for input_stream data
 
-    // Printer used to send data to the output_stream
-    private PrintWriter outputPrinter;
+    private PrintWriter outputPrinter;          // Printer used to send data to the output_stream
 
 
-    // Port used for the tcp connection
+    private TcpState tcpState = TcpState.IDLE;
+
     private int port;
 
-    // Listener used to listen for connection changes
-    private OnTcpListener listener;
+    private OnTcpListener tcpListener;
 
 
 
@@ -56,12 +54,21 @@ public class TcpConnection
     // ========== INNER CLASSES ===========
     //
 
+    public enum  TcpState
+    {
+        IDLE,
+        CONNECTING,
+        CONNECTED,
+        ERROR
+    }
+
     public interface OnTcpListener
     {
         void onData(String data);
 
-        void onConnectionState(int state);
+        void onConnectionStateChanged(TcpState newState);
     }
+
 
     /**
      * AsyncTask used to produce a connected TCP socket
@@ -93,12 +100,15 @@ public class TcpConnection
         }
     }
 
+
     /**
      * Runnable running on a separate thread listening for TCP input stream data.
      * Data is sent to main_thread via Handler(main_looper)
      */
     private class InputHandler  implements Runnable
     {
+        private static final String TAG = "InputHandler";
+
         private Handler mainHandler;
         private final Socket clientSocket;
 
@@ -122,49 +132,45 @@ public class TcpConnection
                             break;
 
                         case MSG_WHAT_ERROR:
-                            onError();
+                            onInputThreadError();
                             break;
                     }
                 }
             };
         }
 
+        private void sendErrorMessage()
+        {
+            mainHandler.sendEmptyMessage(MSG_WHAT_ERROR);
+        }
+
         @Override
         public void run()
         {
+            Log.i(TAG, "Started input_thread");
+
             createMainHandler();
 
             try
             {
                 BufferedReader br = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-                Log.i(TAG, "Started input thread");
+                if(Thread.interrupted()) return;
 
                 while(true)
                 {
-                    if(Thread.interrupted()) break;
                     String readData = br.readLine();
                     if(Thread.interrupted()) break;
 
                     if(readData != null)
-                    {
                         mainHandler.obtainMessage(MSG_WHAT_DATA, readData).sendToTarget();
-                    }
-                    else 
-                    {
-                        mainHandler.sendEmptyMessage(MSG_WHAT_ERROR);
-                    }
+                    else
+                        sendErrorMessage();
                 }
             }
             catch (Exception e)
             {
                 e.printStackTrace();
-            }
-            finally
-            {
-                if(!Thread.interrupted())
-                    mainHandler.sendEmptyMessage(MSG_WHAT_ERROR);
-                else
-                    Log.i(TAG, "Skipping MGS_WHAT_ERROR since input_thread has been interrupted");
+                sendErrorMessage();
             }
         }
     }
@@ -175,6 +181,42 @@ public class TcpConnection
     // ========== METHODS ===========
     //
 
+    // Internal set tcp state. Call the listener if a change occurred
+    private void setTcpState(TcpState newState)
+    {
+        if(getTcpState() != newState)
+        {
+            this.tcpState = newState;
+            if(tcpListener != null) tcpListener.onConnectionStateChanged(getTcpState());
+
+            Log.v(TAG, "Moving to state: " + newState.name());
+        }
+    }
+
+    /** Get the state of this TCP connection */
+    public TcpState getTcpState()
+    {
+        return tcpState;
+    }
+
+    /** Set the listener notified of data receiving and connection state change */
+    public void setTcpListener(OnTcpListener tcpListener)
+    {
+        this.tcpListener = tcpListener;
+    }
+
+    /** If isConnected() returns true return the socket address, return null otherwise */
+    public InetAddress getConnectedAddress()
+    {
+        return isConnected() ? clientSocket.getInetAddress() : null;
+    }
+
+    public int getPort()
+    {
+        return port;
+    }
+
+    // Called from ConnectionTask.onPostExecute(socket) when connection is finished
     private void onConnectionResult(Socket socket)
     {
         clientSocket = socket;
@@ -184,9 +226,15 @@ public class TcpConnection
         {
             onConnected();
         }
-        else Log.e(TAG, "Connection result: failed");
+        else
+        {
+            Log.e(TAG, "Connection result failed");
+            onError();
+        }
+
     }
 
+    // Called if a connected socket is found
     private void onConnected()
     {
         Log.i(TAG, "Connected to: " + clientSocket.getInetAddress().getHostAddress());
@@ -195,28 +243,43 @@ public class TcpConnection
         {
             clientSocket.setKeepAlive(true);
 
-            outputPrinter = new PrintWriter(new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream())), true);
-            
+            outputPrinter =
+                    new PrintWriter(new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream())), true);
+
             if(inputThread != null) inputThread.interrupt();
             inputThread = new Thread(new InputHandler(clientSocket));
             inputThread.start();
+
+            setTcpState(TcpState.CONNECTED);
         }
         catch (IOException e)
         {
             e.printStackTrace();
+            onError();
         }
     }
 
-    private void onError()
+    // Called from input_thread if an error occurs using the main_handler (i.e. running on main_thread)
+    private void onInputThreadError()
     {
-        Log.e(TAG, "Connection error");
+        // "throw" an error only if the socket wasn't intentionally closed using Socket.close()
+        //  since it means it is not an unexpected event
+        if(isConnected()) onError();
     }
 
+    // Called internally when an error occurs
+    private void onError()      //TODO: maybe use error types
+    {
+        setTcpState(TcpState.ERROR);
+    }
+
+    // Running on main thread. Called by input thread when data is read from the input buffer
     private void onDataReceived(String data)
     {
-        Log.v(TAG, "Tcp data: " + data);
+        if(tcpListener != null) tcpListener.onData(data);
     }
 
+    /** Return true if is currently try to connect, false otherwise */
     private boolean isConnecting()
     {
         return  connectionTask != null                                          // valid ref
@@ -224,24 +287,34 @@ public class TcpConnection
                 && !connectionTask.isCancelled();                               // task not cancelled
     }
 
-    private boolean isConnected()
+    /**
+     * Return true if is the socket is connected, false otherwise
+     *
+     * NOTE: The socket is considered connected even if is actually disconnected from the network.
+     *       Only writing or reading from its streams determine if a socket is actually connected or not.
+     *       TcpListener.onConnectionStateChange(TcpState.ERROR) is called (on the main thread) when such operations fail.
+     */
+    private boolean isConnected()       //TODO: get rid off this function
     {
         return clientSocket != null && clientSocket.isConnected();
     }
 
-    public void accept()
+    public void startConnection()
     {
         if(!isConnecting())
         {
+            Log.i(TAG, "Connection in progress");
+
             connectionTask = new ConnectionTask();
+            setTcpState(TcpState.CONNECTING);
             connectionTask.execute(port);
-            Log.i(TAG, "Connecting...");
         }
     }
 
+    /** Free every resource and reset */
     public void reset()
     {
-        Log.v(TAG, "Connection reset");
+        Log.i(TAG, "Connection reset");
 
         // connection task
         if(connectionTask != null)
@@ -273,23 +346,24 @@ public class TcpConnection
         {
             clientSocket = null;
         }
+
+        setTcpState(TcpState.IDLE);
     }
 
     public void sendData(String data)
     {
-        if(isConnected())
+        if(isConnected())   //TODO: should use getState()?
         {
             if(outputPrinter != null)
                 outputPrinter.println(data);
             else
                 throw new AssertionError("outputPrinter is null while the socket is connected!");
         }
-        else Log.e(TAG, "socket is not connected");
-    }
-
-    public void setTcpListener(OnTcpListener listener)
-    {
-        this.listener = listener;
+        else
+        {
+            Log.e(TAG, "SendData() called when not connected");
+            onError();
+        }
     }
 }
 

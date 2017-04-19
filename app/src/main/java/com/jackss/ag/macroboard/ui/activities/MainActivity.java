@@ -10,9 +10,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import com.jackss.ag.macroboard.R;
-import com.jackss.ag.macroboard.network.Beacon;
-import com.jackss.ag.macroboard.network.TcpConnection;
-import com.jackss.ag.macroboard.network.UdpSender;
+import com.jackss.ag.macroboard.network.*;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -22,9 +20,8 @@ public class MainActivity extends AppCompatActivity
     Toolbar toolbar;
     InetAddress address;
 
-    UdpSender sender;
 
-
+    NetBridge netBridge;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -35,48 +32,39 @@ public class MainActivity extends AppCompatActivity
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle("Dumb Title");
 
+        netBridge = new WifiBridge(getApplicationContext());
 
-        sender = new UdpSender();
-        try
-        {
-            address = InetAddress.getByName("192.168.1.5");
-        }
-        catch (UnknownHostException e)
-        {
-            e.printStackTrace();
-        }
-
-        final TcpConnection connection = new TcpConnection(4545);
-        connection.accept();
 
         Button start = (Button) findViewById(R.id.btn_media_prev);
+        start.setText("start");
         start.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)
             {
-
+                netBridge.startConnection();
             }
         });
 
         Button stop = (Button) findViewById(R.id.btn_media_next);
+        stop.setText("stop");
         stop.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)
             {
-
+                netBridge.stopConnection();
             }
         });
 
         final Button send = (Button) findViewById(R.id.btn_media_play);
+        send.setText("send");
         send.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)
             {
-                sender.sendData(address, 4545,"Hey dummy");
-                connection.sendData("Hello");
+                netBridge.sendData("Hello");
             }
         });
     }
