@@ -10,7 +10,7 @@ import java.net.Socket;
 
 
 /**
- * Manages a TCP connection
+ * Manages a TCP connection.
  *
  */
 public class TcpConnection
@@ -71,7 +71,7 @@ public class TcpConnection
 
 
     /**
-     * AsyncTask used to produce a connected TCP socket
+     * AsyncTask used to produce a connected TCP socket.
      */
     private class ConnectionTask extends AsyncTask<Integer, Void, Socket>
     {
@@ -103,7 +103,7 @@ public class TcpConnection
 
     /**
      * Runnable running on a separate thread listening for TCP input stream data.
-     * Data is sent to main_thread via Handler(main_looper)
+     * Data is sent to main_thread via Handler(main_looper).
      */
     private class InputHandler  implements Runnable
     {
@@ -193,24 +193,25 @@ public class TcpConnection
         }
     }
 
-    /** Get the state of this TCP connection */
+    /** Get the state of this TCP connection. */
     public TcpState getTcpState()
     {
         return tcpState;
     }
 
-    /** Set the listener notified of data receiving and connection state change */
+    /** Set the listener notified of data receiving and connection state change. */
     public void setTcpListener(OnTcpListener tcpListener)
     {
         this.tcpListener = tcpListener;
     }
 
-    /** If isConnected() returns true return the socket address, return null otherwise */
+    /** If isConnected() returns true return the socket address, return null otherwise. */
     public InetAddress getConnectedAddress()
     {
         return isConnected() ? clientSocket.getInetAddress() : null;
     }
 
+    /** Get the port used by this connection. */
     public int getPort()
     {
         return port;
@@ -279,7 +280,7 @@ public class TcpConnection
         if(tcpListener != null) tcpListener.onData(data);
     }
 
-    /** Return true if is currently try to connect, false otherwise */
+    /** Return true if is currently try to connect, false otherwise. */
     private boolean isConnecting()
     {
         return  connectionTask != null                                          // valid ref
@@ -288,7 +289,7 @@ public class TcpConnection
     }
 
     /**
-     * Return true if is the socket is connected, false otherwise
+     * Return true if is the socket is connected, false otherwise.
      *
      * NOTE: The socket is considered connected even if is actually disconnected from the network.
      *       Only writing or reading from its streams determine if a socket is actually connected or not.
@@ -299,19 +300,34 @@ public class TcpConnection
         return clientSocket != null && clientSocket.isConnected();
     }
 
-    public void startConnection()
+    /** Check whenever calling startConnection will actually start a connection */
+    public boolean canStartConnection()  //TODO: improve this
     {
-        if(!isConnecting())
+        return !isConnecting();
+    }
+
+    /**
+     * Try to produce a connected Socket. State is moved to TcpState.CONNECTING.
+     *
+     * @return  return true if the connection is successfully started
+     */
+    public boolean startConnection()
+    {
+        if(canStartConnection())
         {
             Log.i(TAG, "Connection in progress");
 
             connectionTask = new ConnectionTask();
             setTcpState(TcpState.CONNECTING);
             connectionTask.execute(port);
+
+            return true;
         }
+
+        return false;
     }
 
-    /** Free every resource and reset */
+    /** Free every resource allowing to start a new connection. */
     public void reset()
     {
         Log.i(TAG, "Connection reset");
@@ -350,6 +366,7 @@ public class TcpConnection
         setTcpState(TcpState.IDLE);
     }
 
+    /** If the connection is open send a data string, do nothing otherwise. */
     public void sendData(String data)
     {
         if(isConnected())   //TODO: should use getState()?
@@ -361,7 +378,7 @@ public class TcpConnection
         }
         else
         {
-            Log.e(TAG, "SendData() called when not connected");
+            Log.e(TAG, "SendData() called when Socket is not connected");
             onError();
         }
     }

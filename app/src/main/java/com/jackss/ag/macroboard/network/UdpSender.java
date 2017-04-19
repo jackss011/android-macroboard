@@ -9,7 +9,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
- * Send udp packets to a specific address and port
+ * Send udp packets to a specific address and port.
  */
 public class UdpSender
 {
@@ -18,7 +18,7 @@ public class UdpSender
     private ExecutorService executorService;
     
 
-    /** Runnable used to send strings to udp using: host, port */
+    // Runnable used to send strings to udp using: host, port
     private class SendingTask implements Runnable
     {
         private final int port;
