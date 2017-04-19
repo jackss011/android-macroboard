@@ -7,6 +7,7 @@ import java.io.*;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 
 
 /**
@@ -245,7 +246,7 @@ public class TcpConnection
             clientSocket.setKeepAlive(true);
 
             outputPrinter =
-                    new PrintWriter(new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream())), true);
+                    new PrintWriter(new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream(), StandardCharsets.UTF_8)), true);
 
             if(inputThread != null) inputThread.interrupt();
             inputThread = new Thread(new InputHandler(clientSocket));
@@ -366,7 +367,11 @@ public class TcpConnection
         setTcpState(TcpState.IDLE);
     }
 
-    /** If the connection is open send a data string, do nothing otherwise. */
+    /**
+     * If the connection is open send a data string, do nothing otherwise.
+     *
+     * @param data Data string to send
+     */
     public void sendData(String data)
     {
         if(isConnected())   //TODO: should use getState()?
