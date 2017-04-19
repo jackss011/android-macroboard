@@ -1,15 +1,12 @@
 package com.jackss.ag.macroboard.network;
 
-import android.os.Handler;
-import android.os.Looper;
-import android.os.Message;
-import android.util.Log;
-
-import java.net.*;
+import android.support.annotation.NonNull;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 /**
  * Send udp packets to a specific address and port
@@ -21,7 +18,7 @@ public class UdpSender
     private ExecutorService executorService;
     
 
-    /** Runnable used to send strings to udp host, port */
+    /** Runnable used to send strings to udp using: host, port */
     private class SendingTask implements Runnable
     {
         private final int port;
@@ -53,7 +50,7 @@ public class UdpSender
         executorService = Executors.newSingleThreadExecutor();
     }
 
-    public void sendData(InetAddress address, int port, String data)
+    public void sendData(@NonNull InetAddress address, int port, String data)
     {
         executorService.execute(new SendingTask(address, port, data));
     }
