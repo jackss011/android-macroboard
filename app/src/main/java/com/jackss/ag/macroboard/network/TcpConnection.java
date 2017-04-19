@@ -119,7 +119,7 @@ public class TcpConnection
         
         private void createMainHandler()
         {
-            mainHandler = new Handler(Looper.getMainLooper())
+            mainHandler = new Handler(Looper.getMainLooper())   //TODO: this may cause leaks?
             {
                 @Override
                 public void handleMessage(Message msg)
