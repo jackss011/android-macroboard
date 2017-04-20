@@ -22,7 +22,7 @@ abstract public class NetBridge
         ERROR
     }
 
-    interface OnConnectionStateListener
+    public interface OnConnectionStateListener
     {
         void onConnectionStateChanged(ConnectionState newState);
     }
