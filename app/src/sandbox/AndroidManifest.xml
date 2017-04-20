@@ -2,7 +2,7 @@
 
     <application>
 
-        <activity android:name="com.jackss.ag.macroboard.sandbox.NetworkTests">
+        <activity android:name="com.jackss.ag.macroboard.sandbox.NetworkTestsActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

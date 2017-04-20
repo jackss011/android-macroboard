@@ -4,7 +4,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import com.jackss.ag.macroboard.R;
 
-public class NetworkTests extends AppCompatActivity
+public class NetworkTestsActivity extends AppCompatActivity
 {
     @Override
     protected void onCreate(Bundle savedInstanceState)
