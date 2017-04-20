@@ -246,7 +246,7 @@ public class TcpConnection
 
         try
         {
-            clientSocket.setKeepAlive(true);
+            clientSocket.setTcpNoDelay(true);
 
             outputPrinter =
                     new PrintWriter(new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream(), StandardCharsets.UTF_8)), true);
