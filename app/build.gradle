@@ -27,7 +27,7 @@ android {
     }
 
     variantFilter { variant ->
-        // Ignore sandboxDebug since it makes no sense
+        // Ignore sandboxRelease since it makes no sense
         if(variant.name == 'sandboxRelease')
             setIgnore true
     }
