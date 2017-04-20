@@ -1,6 +1,7 @@
 package com.jackss.ag.macroboard.network;
 
 import android.content.Context;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 /**
@@ -57,9 +58,11 @@ abstract public class NetBridge
     }
 
     // final
-    public void setConnectionStateListener(OnConnectionStateListener connectionStateListener)
+    public void setConnectionStateListener(@Nullable OnConnectionStateListener connectionStateListener)
     {
         this.connectionStateListener = connectionStateListener;
+
+        if(connectionStateListener != null) connectionStateListener.onConnectionStateChanged(getConnectionState());
     }
 
     protected void setConnectionState(ConnectionState state)

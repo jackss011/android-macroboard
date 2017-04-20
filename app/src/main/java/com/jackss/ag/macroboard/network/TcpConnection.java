@@ -1,6 +1,7 @@
 package com.jackss.ag.macroboard.network;
 
 import android.os.*;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import java.io.*;
@@ -201,9 +202,11 @@ public class TcpConnection
     }
 
     /** Set the listener notified of data receiving and connection state change. */
-    public void setTcpListener(OnTcpListener tcpListener)
+    public void setTcpListener(@Nullable OnTcpListener tcpListener)
     {
         this.tcpListener = tcpListener;
+
+        if(tcpListener != null) tcpListener.onConnectionStateChanged(getTcpState());
     }
 
     /** If isConnected() returns true return the socket address, return null otherwise. */
