@@ -10,6 +10,7 @@
             </intent-filter>
         </activity>
 
+        <!--Prevent double app icon-->
         <activity android:name="com.jackss.ag.macroboard.ui.activities.MainActivity">
             <intent-filter tools:node="removeAll">
             </intent-filter>
