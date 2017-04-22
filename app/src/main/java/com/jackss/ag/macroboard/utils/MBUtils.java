@@ -2,8 +2,11 @@ package com.jackss.ag.macroboard.utils;
 
 import android.content.res.Resources;
 import android.graphics.Color;
+import android.support.annotation.NonNull;
 import android.util.DisplayMetrics;
 import android.view.View;
+import java.util.concurrent.ThreadFactory;
+
 
 /**
  *  Static library for generic methods
@@ -42,5 +45,20 @@ public class MBUtils
         hsv[2] = hsv[2] * amount;
 
         return Color.HSVToColor(hsv);
+    }
+
+    /** Create a thread factory for network threads */
+    public static ThreadFactory buildNetworkThreadFactory()
+    {
+        return new ThreadFactory()
+        {
+            @Override
+            public Thread newThread(@NonNull Runnable r)
+            {
+                Thread t = new Thread(r);
+                t.setDaemon(true);
+                return t;
+            }
+        };
     }
 }
