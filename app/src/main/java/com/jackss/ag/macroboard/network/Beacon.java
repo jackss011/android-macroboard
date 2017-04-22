@@ -4,6 +4,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
+import com.jackss.ag.macroboard.utils.ExpiringList;
 
 import java.io.IOException;
 import java.net.*;
@@ -30,8 +31,10 @@ public class Beacon
 
     private OnBeaconEventListener eventListener;
 
+    private ExpiringList<InetAddress> deviceList;
 
 
+    
 // |==============================
 // |==>  CLASSES
 // |===============================
@@ -160,6 +163,16 @@ public class Beacon
     }
 
 
+// |==============================
+// |==>  CONSTRUCTOR
+// |===============================
+
+    public Beacon()
+    {
+        deviceList = new ExpiringList<>(10);
+    }
+
+
 
 // |==============================
 // |==>  METHODS
@@ -167,7 +180,12 @@ public class Beacon
 
     private void onAddress(InetAddress address)
     {
-        Log.d(TAG, "Found address: " + address.getHostAddress());
+        if(deviceList.add(address))
+        {
+            Log.i(TAG, "Found new address");
+
+            if(eventListener != null) eventListener.onDeviceFound(address);
+        }
     }
 
     private void onError()
@@ -196,6 +214,8 @@ public class Beacon
     {
         if(!isRunning())
         {
+            deviceList.clear();
+
             receiverTask = new ReceiverTask();
             receiverThread = new Thread(receiverTask);
             receiverThread.setDaemon(true);
@@ -209,6 +229,8 @@ public class Beacon
     /** Stop sending packets */
     public void stopBroadcast()
     {
+        deviceList.clear();
+
         if(multicastFuture != null)
         {
             multicastFuture.cancel(true);

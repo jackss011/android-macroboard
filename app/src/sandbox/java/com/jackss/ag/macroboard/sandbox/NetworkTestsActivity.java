@@ -11,6 +11,8 @@ import com.jackss.ag.macroboard.network.Beacon;
 import com.jackss.ag.macroboard.network.NetBridge;
 import com.jackss.ag.macroboard.network.WifiBridge;
 
+import java.net.InetAddress;
+
 public class NetworkTestsActivity extends AppCompatActivity implements NetBridge.OnConnectionStateListener
 {
     private static final String TAG = "NetworkTestsActivity";
@@ -38,6 +40,20 @@ public class NetworkTestsActivity extends AppCompatActivity implements NetBridge
         wifiBridge.setConnectionStateListener(this);
 
         beacon = new Beacon();
+        beacon.setBeaconListener(new Beacon.OnBeaconEventListener()
+        {
+            @Override
+            public void onDeviceFound(InetAddress address)
+            {
+                result.setText(address.getHostAddress());
+            }
+
+            @Override
+            public void onFailure()
+            {
+                result.setText("Failed");
+            }
+        });
     }
 
     public void onClick(View view)
@@ -55,7 +71,7 @@ public class NetworkTestsActivity extends AppCompatActivity implements NetBridge
         }
         else if(view.equals(send))
         {
-            wifiBridge.sendData("Hello");
+            //wifiBridge.sendData("Hello");
         }
     }
 
