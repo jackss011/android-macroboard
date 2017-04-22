@@ -209,7 +209,7 @@ public class TcpConnection
         if(tcpListener != null) tcpListener.onConnectionStateChanged(getTcpState());
     }
 
-    /** If isConnected() returns true return the socket address, return null otherwise. */
+    /** If isConnected() equals true return the socket address, return null otherwise. */
     public InetAddress getConnectedAddress()
     {
         return isConnected() ? clientSocket.getInetAddress() : null;

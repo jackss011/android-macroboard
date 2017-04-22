@@ -1,11 +1,12 @@
 package com.jackss.ag.macroboard.network;
 
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.util.Log;
 
 import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.InetAddress;
-import java.net.MulticastSocket;
+import java.net.*;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -18,49 +19,42 @@ public class Beacon
 {
     private static final String TAG = "Beacon";
 
-    /** Task which multicast a DatagramPacket over the network. Can be cancelled */
-    private static class BeaconTask implements Runnable
+    private static final int MSG_WHAT_ADDRESS = 1200;
+    private static final int MSG_WHAT_ERROR = 1400;
+
+    private ExecutorService multicastExecutor = Executors.newSingleThreadExecutor();
+    private Future multicastFuture;
+
+    private Thread receiverThread;
+    private ReceiverTask receiverTask;
+
+
+
+// |==============================
+// |==>  CLASSES
+// |===============================
+
+    /** Multicast upd packets over the network */
+    private static class MulticastTask implements Runnable
     {
         @Override
         public void run()
         {
-            final int port = 4545;
-            MulticastSocket multicastSocket = null;
+            Log.i(TAG, "Starting broadcasting thread");
 
-            Log.v(TAG, "Beacon start...");
-
-            try
+            try(MulticastSocket multicastSocket = new MulticastSocket())
             {
-                InetAddress group = InetAddress.getByName("230.185.192.108");
-                multicastSocket = new MulticastSocket(port);    //TODO: needs to call leaveGroup?
+                InetAddress group = InetAddress.getByName("228.5.6.7");
+                multicastSocket.joinGroup(group);
 
-                // {/*
-                //     {Enumeration<NetworkInterface> l = NetworkInterface.getNetworkInterfaces();
-                //     while(l.hasMoreElements())
-                //     {
-                //         NetworkInterface i = l.nextElement();
-                //
-                //         if(i.isUp() && !i.isLoopback())
-                //         {
-                //             TAG.v(TAG, i.getName());
-                //         }
-                //
-                //     }
-                //     multicastSocket.setNetworkInterface(NetworkInterface.getByName("rndis0"));}
-                //     TAG.v(TAG, "run: Beacon starting on: " + multicastSocket.getNetworkInterface().getName());
-                // */}
-                /**/
-
-                // create the packet
-                byte[] message = "Hey dude".getBytes(StandardCharsets.UTF_8);
-                DatagramPacket packet = new DatagramPacket(message, message.length, group, port);
-
-                // send the packet until is cancelled
-                for(;;)
+                while(true)
                 {
+                    String test = "test";
+                    byte sending[] = test.getBytes(StandardCharsets.UTF_8);
+                    DatagramPacket packet = new DatagramPacket(sending, sending.length, group, 4545);
+
                     multicastSocket.send(packet);
 
-                    // sleep to prevent too many unnecessary messages
                     try{ Thread.sleep(1000); } catch (InterruptedException e) { break; }
                 }
             }
@@ -68,28 +62,110 @@ public class Beacon
             {
                 e.printStackTrace();
             }
+        }
+    }
+
+    /** Receive packets sent as response from listening devices */
+    private class ReceiverTask implements Runnable
+    {
+        private Handler mainHandler;
+
+        DatagramSocket receiverSocket;
+
+        private void createMainHandler() //TODO: use parent class maybe
+        {
+            mainHandler = new Handler(Looper.getMainLooper())
+            {
+                @Override
+                public void handleMessage(Message msg)
+                {
+                    switch (msg.what)
+                    {
+                        case MSG_WHAT_ADDRESS:
+                            onAddress((InetAddress) msg.obj);
+                            break;
+
+                        case MSG_WHAT_ERROR:
+                            onError();
+                            break;
+
+                        default:
+                            throw new AssertionError("Unknown msg.what");
+                    }
+                }
+            };
+        }
+
+        // Close receiver socket. Needed to interrupt DatagramSocket.receive(packet)
+        void shutdown()
+        {
+            if(receiverSocket != null) receiverSocket.close();
+        }
+
+        @Override
+        public void run()
+        {
+            Log.i(TAG, "Starting receiverSocket thread");
+
+            createMainHandler();
+
+            try
+            {
+                receiverSocket = new DatagramSocket(4545);
+
+                while(true)
+                {
+                    byte buff[] = new byte[256];
+                    DatagramPacket request = new DatagramPacket(buff, buff.length);
+                    receiverSocket.receive(request);
+
+                    if(request.getAddress() != null) //TODO: check for response
+                    {
+                        mainHandler.obtainMessage(MSG_WHAT_ADDRESS, request.getAddress()).sendToTarget();
+                    }
+                    else throw new AssertionError("Unexpected error");
+
+                    if(Thread.interrupted()) break;
+                }
+
+                Log.i(TAG, "Quitting receiverSocket thread");
+            }
+            catch (Exception e)
+            {
+                if(receiverSocket != null && !receiverSocket.isClosed())
+                    mainHandler.sendEmptyMessage(MSG_WHAT_ERROR);
+
+                e.printStackTrace();
+            }
             finally
             {
-                if(multicastSocket != null) multicastSocket.close();
+                shutdown();
             }
+
         }
     }
 
 
 
-    /** Executor used to run a BeaconTask */
-    private ExecutorService beaconExecutor = Executors.newSingleThreadExecutor();
+// |==============================
+// |==>  METHODS
+// |==============================
 
-    /** Future of the running beacon. If null no BeaconTask is running */
-    private Future beaconFuture = null;
+    private void onAddress(InetAddress address)
+    {
+        Log.d(TAG, "Found address: " + address.getHostAddress());
+    }
 
-
+    private void onError()
+    {
+        stopBroadcast();
+    }
 
     /** Is currently sending packets? */
     public boolean isRunning()
     {
-        return beaconExecutor != null && !beaconExecutor.isShutdown() && !beaconExecutor.isTerminated()     //TODO: too many checks?
-                && beaconFuture != null && !beaconFuture.isCancelled() && !beaconFuture.isDone();
+        return multicastExecutor != null && !multicastExecutor.isShutdown() && !multicastExecutor.isTerminated()     //TODO: too many checks?
+                && multicastFuture != null && !multicastFuture.isCancelled() && !multicastFuture.isDone();
     }
 
     /** Start sending packet */
@@ -97,25 +173,35 @@ public class Beacon
     {
         if(!isRunning())
         {
-            try
-            {
-                beaconFuture = beaconExecutor.submit(new BeaconTask());
-            }
-            catch (Exception e){ e.printStackTrace(); }
+            receiverTask = new ReceiverTask();
+            receiverThread = new Thread(receiverTask);
+            receiverThread.setDaemon(true);
+            receiverThread.start();
+
+            multicastFuture = multicastExecutor.submit(new MulticastTask());
         }
-        else
-        {
-            Log.e(TAG, "Beacon is already running");
-        }
+        else Log.e(TAG, "Beacon is already running");
     }
 
     /** Stop sending packets */
     public void stopBroadcast()
     {
-        if(beaconFuture != null)
+        if(multicastFuture != null)
         {
-            beaconFuture.cancel(true);
-            beaconFuture = null;
+            multicastFuture.cancel(true);
+            multicastFuture = null;
+        }
+
+        if(receiverThread != null)
+        {
+            receiverThread.interrupt(); //TODO: maybe not necessary
+            receiverThread = null;
+        }
+
+        if(receiverTask != null)
+        {
+            receiverTask.shutdown();
+            receiverTask = null;
         }
 
         Log.i(TAG, "Beacon future has been shutdown");

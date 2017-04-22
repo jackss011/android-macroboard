@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import com.jackss.ag.macroboard.R;
+import com.jackss.ag.macroboard.network.Beacon;
 import com.jackss.ag.macroboard.network.NetBridge;
 import com.jackss.ag.macroboard.network.WifiBridge;
 
@@ -19,6 +20,7 @@ public class NetworkTestsActivity extends AppCompatActivity implements NetBridge
     private TextView result;
 
     private WifiBridge wifiBridge;
+    private Beacon beacon;
 
 
     @Override
@@ -34,6 +36,8 @@ public class NetworkTestsActivity extends AppCompatActivity implements NetBridge
 
         wifiBridge = new WifiBridge(this);
         wifiBridge.setConnectionStateListener(this);
+
+        beacon = new Beacon();
     }
 
     public void onClick(View view)
@@ -41,11 +45,13 @@ public class NetworkTestsActivity extends AppCompatActivity implements NetBridge
         if(view.equals(start))
         {
             Log.v(TAG, "Test ");
-            wifiBridge.startConnection();
+            //wifiBridge.startConnection();
+            beacon.startBroadcast();
         }
         else if(view.equals(stop))
         {
-            wifiBridge.stopConnection();
+            //wifiBridge.stopConnection();
+            beacon.stopBroadcast();
         }
         else if(view.equals(send))
         {
