@@ -28,13 +28,26 @@ public class Beacon
     private Thread receiverThread;
     private ReceiverTask receiverTask;
 
+    private OnBeaconEventListener eventListener;
+
 
 
 // |==============================
 // |==>  CLASSES
 // |===============================
 
-    /** Multicast upd packets over the network */
+    /** Beacon callbacks */
+    public interface OnBeaconEventListener
+    {
+        /** Called when a new device response */
+        void onDeviceFound(InetAddress address);
+
+        /** Called if an error occurs */
+        void onFailure();
+    }
+
+
+    /** Multicast UDP packets over the network */
     private static class MulticastTask implements Runnable
     {
         @Override
@@ -65,12 +78,14 @@ public class Beacon
         }
     }
 
+
     /** Receive packets sent as response from listening devices */
     private class ReceiverTask implements Runnable
     {
         private Handler mainHandler;
 
-        DatagramSocket receiverSocket;
+        private DatagramSocket receiverSocket;
+
 
         private void createMainHandler() //TODO: use parent class maybe
         {
@@ -141,7 +156,6 @@ public class Beacon
             {
                 shutdown();
             }
-
         }
     }
 
@@ -158,7 +172,16 @@ public class Beacon
 
     private void onError()
     {
+        Log.i(TAG, "Unknown error occurred");
+
         stopBroadcast();
+        if(eventListener != null) eventListener.onFailure();
+    }
+
+    /** Set listener for beacon events */
+    public void setBeaconListener(OnBeaconEventListener listener)
+    {
+        this.eventListener = listener;
     }
 
     /** Is currently sending packets? */
