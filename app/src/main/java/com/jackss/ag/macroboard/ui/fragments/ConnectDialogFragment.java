@@ -3,22 +3,18 @@ package com.jackss.ag.macroboard.ui.fragments;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
-import android.content.DialogInterface;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
+import android.os.Handler;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import com.jackss.ag.macroboard.R;
 import com.jackss.ag.macroboard.network.Beacon;
 
 import java.net.InetAddress;
-import java.util.ArrayList;
 
 /**
  *
@@ -32,6 +28,36 @@ public class ConnectDialogFragment extends DialogFragment implements Beacon.OnBe
     private ListView deviceList;
     private SocketAddressAdapter adapter;
 
+    private Handler mHandler;
+    private Runnable updateDevicesTask;
+
+    private OnConnectDialogEventListener dialogEventListener;
+
+
+// |==============================
+// |==>  CLASSES
+// |===============================
+
+    public interface OnConnectDialogEventListener
+    {
+        void onDialogConnectRequest(String address);
+    }
+
+    private class UpdateDevicesTask implements Runnable
+    {
+        @Override
+        public void run()
+        {
+            updateDevices();
+            postDeviceUpdate();
+        }
+    }
+
+
+// |==============================
+// |==>  METHODS
+// |===============================
+
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
@@ -41,7 +67,9 @@ public class ConnectDialogFragment extends DialogFragment implements Beacon.OnBe
         beacon.setBeaconListener(this);
 
         adapter = new SocketAddressAdapter(getActivity());
-        adapter.add("Test row");
+
+        mHandler = new Handler();
+        updateDevicesTask = new UpdateDevicesTask();
     }
 
     @Override
@@ -50,37 +78,23 @@ public class ConnectDialogFragment extends DialogFragment implements Beacon.OnBe
         ViewGroup view = (ViewGroup) getActivity().getLayoutInflater().inflate(R.layout.fragment_dialog_connect, null);
 
         deviceList = (ListView) view.findViewById(R.id.device_list);
-        setupDeviceList();
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder .setView(view)
-                .setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener()
-                {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which)
-                    {
-                        Log.d(TAG, "Dialog cancel");
-                    }
-                })
-                .setTitle("Connect to device");
-
-        return builder.create();
-    }
-
-    private void setupDeviceList()
-    {
         deviceList.setAdapter(adapter);
         deviceList.setChoiceMode(AbsListView.CHOICE_MODE_NONE);
-
         deviceList.setOnItemClickListener(new AdapterView.OnItemClickListener()
         {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id)
             {
-
+                deviceClicked(adapter.getItem(position));
             }
         });
 
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder .setView(view)
+                .setNegativeButton(R.string.cancel, null)
+                .setTitle(R.string.connect_to_device);
+
+        return builder.create();
     }
 
     @Override
@@ -89,6 +103,7 @@ public class ConnectDialogFragment extends DialogFragment implements Beacon.OnBe
         super.onStart();
 
         beacon.startBroadcast();
+        postDeviceUpdate();
         updateUI();
     }
 
@@ -98,32 +113,55 @@ public class ConnectDialogFragment extends DialogFragment implements Beacon.OnBe
         super.onStop();
 
         beacon.stopBroadcast();
+        stopDeviceUpdate();
     }
 
-    private void setConnectEnabled(boolean enabled)
+    /** Set an event used to list for connect requests */
+    public void setDialogEventListener(OnConnectDialogEventListener dialogEventListener)
     {
-        AlertDialog dialog = (AlertDialog) getDialog();
-        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(enabled);
+        this.dialogEventListener = dialogEventListener;
     }
 
-    @Override
-    public void onDeviceFound(InetAddress address)
+    private void postDeviceUpdate()
+    {
+        stopDeviceUpdate();
+        mHandler.postDelayed(updateDevicesTask, 3000); //TODO: hardcoded
+    }
+
+    private void stopDeviceUpdate()
+    {
+        mHandler.removeCallbacks(updateDevicesTask);
+    }
+
+    private void deviceClicked(String address)
+    {
+        if(address == null) throw new AssertionError("Selected null address");
+
+        if(dialogEventListener != null) dialogEventListener.onDialogConnectRequest(address);
+        dismiss();
+    }
+
+    private void updateUI()
+    {
+        adapter.notifyDataSetChanged();
+    }
+
+    private void updateDevices()
     {
         adapter.clear();
         adapter.addAll(beacon.getDevicesAsStrings());
         updateUI();
     }
 
-    private void updateUI()
+    @Override
+    public void onDeviceFound(InetAddress address)
     {
-        adapter.notifyDataSetChanged();
-        setConnectEnabled(adapter.getCount() > 0);
+        updateDevices();
     }
 
     @Override
     public void onFailure()
     {
-        Log.e(TAG, "Failed beacon");
-        dismiss();
+        throw new AssertionError("Beacon failed");
     }
 }

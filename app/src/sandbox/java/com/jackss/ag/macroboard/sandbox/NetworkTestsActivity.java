@@ -14,7 +14,7 @@ import com.jackss.ag.macroboard.ui.fragments.ConnectDialogFragment;
 
 import java.net.InetAddress;
 
-public class NetworkTestsActivity extends AppCompatActivity implements NetBridge.OnConnectionStateListener
+public class NetworkTestsActivity extends AppCompatActivity implements NetBridge.OnConnectionStateListener, ConnectDialogFragment.OnConnectDialogEventListener
 {
     private static final String TAG = "NetworkTestsActivity";
 
@@ -67,6 +67,7 @@ public class NetworkTestsActivity extends AppCompatActivity implements NetBridge
         if(connectDialogFragment == null)
         {
             connectDialogFragment = new ConnectDialogFragment();
+            connectDialogFragment.setDialogEventListener(this);
         }
 
         connectDialogFragment.show(getFragmentManager(), null);
@@ -78,5 +79,11 @@ public class NetworkTestsActivity extends AppCompatActivity implements NetBridge
         super.onStart();
 
         showDialog();
+    }
+
+    @Override
+    public void onDialogConnectRequest(String address)
+    {
+        Log.d(TAG, "Connect request to: " + address);
     }
 }

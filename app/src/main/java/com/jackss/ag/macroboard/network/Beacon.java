@@ -43,7 +43,7 @@ public class Beacon
 // |===============================
 
     /** Beacon callbacks */
-    public interface OnBeaconEventListener
+    public interface OnBeaconEventListener  //TODO: rename this class
     {
         /** Called when a new device response */
         void onDeviceFound(InetAddress address);
@@ -63,14 +63,14 @@ public class Beacon
 
             try(MulticastSocket multicastSocket = new MulticastSocket())
             {
-                InetAddress group = InetAddress.getByName("228.5.6.7");
+                InetAddress group = InetAddress.getByName("228.5.6.7"); //TODO: hardcoded
                 multicastSocket.joinGroup(group);
 
                 while(true)
                 {
                     String test = "test";
                     byte sending[] = test.getBytes(StandardCharsets.UTF_8);
-                    DatagramPacket packet = new DatagramPacket(sending, sending.length, group, 4545);
+                    DatagramPacket packet = new DatagramPacket(sending, sending.length, group, 4545); //TODO: hardcoded
 
                     multicastSocket.send(packet);
 
@@ -201,12 +201,12 @@ public class Beacon
 
     public Set<String> getDevicesAsStrings()
     {
-        Set<String> devs = new HashSet<>();
+        Set<String> devices = new HashSet<>();
 
         for(InetAddress address : deviceList.getList())
-            devs.add(address.getHostAddress());
+            devices.add(address.getHostAddress());
 
-        return devs;
+        return devices;
     }
 
     /** Set listener for beacon events */
@@ -216,9 +216,9 @@ public class Beacon
     }
 
     /** Is currently sending packets? */
-    public boolean isRunning()
+    public boolean isRunning()      //TODO: too many checks?
     {
-        return multicastExecutor != null && !multicastExecutor.isShutdown() && !multicastExecutor.isTerminated()     //TODO: too many checks?
+        return multicastExecutor != null && !multicastExecutor.isShutdown() && !multicastExecutor.isTerminated()
                 && multicastFuture != null && !multicastFuture.isCancelled() && !multicastFuture.isDone();
     }
 

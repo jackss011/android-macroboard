@@ -17,7 +17,7 @@
         android:layout_gravity="center_vertical"/>
 
     <Space
-        android:layout_width="24dp"
+        android:layout_width="@dimen/icon_label_space"
         android:layout_height="match_parent" />
 
     <TextView

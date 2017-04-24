@@ -15,9 +15,9 @@ import com.jackss.ag.macroboard.R;
 /**
  *
  */
-public class SocketAddressAdapter extends ArrayAdapter<String>
+class SocketAddressAdapter extends ArrayAdapter<String>
 {
-    public SocketAddressAdapter(@NonNull Context context)//, @LayoutRes int resource)
+    SocketAddressAdapter(@NonNull Context context)//, @LayoutRes int resource)
     {
         super(context, 0);
     }
