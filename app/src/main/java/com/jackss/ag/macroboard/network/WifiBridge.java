@@ -7,11 +7,13 @@ import android.net.NetworkInfo;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
+import java.net.InetAddress;
+
 
 /**
  *
  */
-public class WifiBridge extends NetBridge
+public class WifiBridge extends NetBridge<InetAddress>
 {
     private static final String TAG = "WifiBridge";
 
@@ -47,14 +49,14 @@ public class WifiBridge extends NetBridge
     @Override
     public boolean canStartConnection()
     {
-        return isWifiConnected(getContext());
-    }
+        return true;
+    } //TODO: useless function
 
     @Override
-    public void startConnection()
+    public void startConnection(InetAddress address)
     {
         if(canStartConnection())
-            tcpConnection.startConnection();
+            tcpConnection.startConnection(address);
     }
 
     @Override
@@ -90,19 +92,5 @@ public class WifiBridge extends NetBridge
         }
 
         return true;
-    }
-
-    public static boolean isWifiConnected(@NonNull Context context)
-    {
-        ConnectivityManager manager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        Network networks[] = manager.getAllNetworks();
-
-        for(Network net : networks)
-        {
-            NetworkInfo info = manager.getNetworkInfo(net);
-            if(info.getType() == ConnectivityManager.TYPE_WIFI) return info.isConnected();
-        }
-
-        return false;
     }
 }

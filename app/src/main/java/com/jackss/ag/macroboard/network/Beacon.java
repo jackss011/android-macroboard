@@ -3,12 +3,15 @@ package com.jackss.ag.macroboard.network;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.util.ArraySet;
 import android.util.Log;
 import com.jackss.ag.macroboard.utils.ExpiringList;
 
 import java.io.IOException;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -194,6 +197,16 @@ public class Beacon
 
         stopBroadcast();
         if(eventListener != null) eventListener.onFailure();
+    }
+
+    public Set<String> getDevicesAsStrings()
+    {
+        Set<String> devs = new HashSet<>();
+
+        for(InetAddress address : deviceList.getList())
+            devs.add(address.getHostAddress());
+
+        return devs;
     }
 
     /** Set listener for beacon events */

@@ -27,7 +27,7 @@ public class TcpConnection
 
     private Socket clientSocket;
 
-    private ConnectionTask connectionTask;      // AsyncTask used to produce a connected socket
+    private AsyncTask connectionTask;      // AsyncTask used to produce a connected socket
 
     private Thread inputThread;                 // Thread listening for input_stream data
 
@@ -42,9 +42,9 @@ public class TcpConnection
 
 
 
-    //
-    // ========== CONSTRUCTOR ===========
-    //
+// |==============================
+// |==>  CONSTRUCTORS
+// |===============================
 
     public TcpConnection(int port)
     {
@@ -52,11 +52,11 @@ public class TcpConnection
     }
 
 
-    //
-    // ========== INNER CLASSES ===========
-    //
+// |==============================
+// |==>  CLASSES
+// |===============================
 
-    public enum  TcpState
+    enum  TcpState
     {
         IDLE,
         CONNECTING,
@@ -64,11 +64,26 @@ public class TcpConnection
         ERROR
     }
 
-    public interface OnTcpListener
+
+    interface OnTcpListener
     {
         void onData(String data);
 
         void onConnectionStateChanged(TcpState newState);
+    }
+
+
+    /** Struct containing address and port */
+    private class SocketInfo
+    {
+        InetAddress address;
+        int port;
+
+        SocketInfo(InetAddress address, int port)
+        {
+            this.address = address;
+            this.port = port;
+        }
     }
 
 
@@ -85,6 +100,34 @@ public class TcpConnection
             try(ServerSocket serverSocket = new ServerSocket(port))
             {
                 return serverSocket.accept();
+            }
+            catch (IOException e)
+            {
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Socket socket)
+        {
+            // only if the task is not cancelled
+            if(!isCancelled()) onConnectionResult(socket);
+        }
+    }
+
+
+    private class ClientConnectionTask extends AsyncTask<SocketInfo, Void, Socket>
+    {
+        @Override
+        protected Socket doInBackground(SocketInfo... args)
+        {
+            SocketInfo info = args[0];
+
+            try(Socket socket = new Socket(info.address, info.port))
+            {
+                return socket;
             }
             catch (IOException e)
             {
@@ -179,9 +222,9 @@ public class TcpConnection
 
 
 
-    //
-    // ========== METHODS ===========
-    //
+// |==============================
+// |==>  METHODS
+// |===============================
 
     // Internal set tcp state. Call the listener if a change occurred
     private void setTcpState(TcpState newState)
@@ -315,15 +358,15 @@ public class TcpConnection
      *
      * @return  return true if the connection is successfully started
      */
-    public boolean startConnection()
+    public boolean startConnection(InetAddress address)
     {
         if(canStartConnection())
         {
             Log.i(TAG, "Connection in progress");
 
-            connectionTask = new ConnectionTask();
+            connectionTask = new ClientConnectionTask();
             setTcpState(TcpState.CONNECTING);
-            connectionTask.execute(port);
+            connectionTask.execute(new SocketInfo(address, 4545));
 
             return true;
         }
@@ -351,7 +394,11 @@ public class TcpConnection
         }
 
         // output printer
-        outputPrinter = null;
+        if(outputPrinter != null)
+        {
+            outputPrinter.close();
+            outputPrinter = null;
+        }
 
         // client socket
         if(clientSocket != null) try

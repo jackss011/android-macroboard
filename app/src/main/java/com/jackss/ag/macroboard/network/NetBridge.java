@@ -7,7 +7,7 @@ import android.util.Log;
 /**
  *
  */
-abstract public class NetBridge
+abstract public class NetBridge<T>
 {
     public enum DataReliability
     {
@@ -44,7 +44,7 @@ abstract public class NetBridge
     // interface
     abstract public boolean canStartConnection();
 
-    abstract public void startConnection();
+    abstract public void startConnection(T address);
 
     abstract public void stopConnection();
 
