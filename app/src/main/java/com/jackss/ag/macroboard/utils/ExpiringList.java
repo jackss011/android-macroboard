@@ -64,14 +64,24 @@ public class ExpiringList<T> implements Iterable<T>
         final long systemTime = getAbsoluteTime();
         boolean updated = false;
 
-        for(Map.Entry<T, Long> entry: map.entrySet())
+        for(Iterator<Map.Entry<T, Long>> it = map.entrySet().iterator(); it.hasNext(); )
         {
+            Map.Entry<T, Long> entry = it.next();
             if(entry.getValue() <= systemTime)
             {
-                map.remove(entry.getKey());
+                it.remove();
                 updated = true;
             }
         }
+
+        // for(Map.Entry<T, Long> entry: map.entrySet())
+        // {
+        //     if(entry.getValue() <= systemTime)
+        //     {
+        //         map.remove(entry.getKey());
+        //         updated = true;
+        //     }
+        // }
 
         return updated;
     }
