@@ -123,17 +123,20 @@ public class ConnectDialogFragment extends DialogFragment implements Beacon.OnBe
         this.dialogEventListener = dialogEventListener;
     }
 
+    // Schedule an update in the handler and remove any previous one.
     private void postDeviceUpdate()
     {
         stopDeviceUpdate();
         mHandler.postDelayed(updateDevicesTask, 3000); //TODO: hardcoded
     }
 
+    // Remove any update callback from the handler
     private void stopDeviceUpdate()
     {
         mHandler.removeCallbacks(updateDevicesTask);
     }
 
+    // Called when a device int the list is clicked
     private void deviceClicked(String address)
     {
         if(address == null) throw new AssertionError("Selected null address");
@@ -142,11 +145,13 @@ public class ConnectDialogFragment extends DialogFragment implements Beacon.OnBe
         dismiss();
     }
 
+    // Fresh UI update
     private void updateUI()
     {
         adapter.notifyDataSetChanged();
     }
 
+    // Fetch devices from the beacon and add them to the adapter
     private void updateDevices()
     {
         adapter.clear();
