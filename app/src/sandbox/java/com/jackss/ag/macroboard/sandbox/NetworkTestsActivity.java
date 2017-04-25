@@ -46,14 +46,14 @@ public class NetworkTestsActivity extends AppCompatActivity implements NetBridge
         {
             showDialog();
         }
-        else if(view.equals(stop))
-        {
-
-        }
-        else if(view.equals(send))
-        {
-
-        }
+        // else if(view.equals(stop))
+        // {
+        //
+        // }
+        // else if(view.equals(send))
+        // {
+        //
+        // }
     }
 
     @Override
@@ -77,8 +77,6 @@ public class NetworkTestsActivity extends AppCompatActivity implements NetBridge
     protected void onStart()
     {
         super.onStart();
-
-        showDialog();
     }
 
     @Override
