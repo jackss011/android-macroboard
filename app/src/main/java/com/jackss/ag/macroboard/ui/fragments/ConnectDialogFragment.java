@@ -13,6 +13,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import com.jackss.ag.macroboard.R;
 import com.jackss.ag.macroboard.network.Beacon;
+import com.jackss.ag.macroboard.network.SocketInfo;
 
 import java.net.InetAddress;
 
@@ -154,7 +155,7 @@ public class ConnectDialogFragment extends DialogFragment implements Beacon.OnBe
     }
 
     @Override
-    public void onDeviceFound(InetAddress address)
+    public void onDeviceFound(SocketInfo socketInfo)
     {
         updateDevices();
     }

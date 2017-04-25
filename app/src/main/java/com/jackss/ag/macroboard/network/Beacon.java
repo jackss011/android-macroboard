@@ -3,7 +3,6 @@ package com.jackss.ag.macroboard.network;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.util.ArraySet;
 import android.util.Log;
 import com.jackss.ag.macroboard.utils.ExpiringList;
 
@@ -34,7 +33,7 @@ public class Beacon
 
     private OnBeaconEventListener eventListener;
 
-    private ExpiringList<InetAddress> deviceList;
+    private ExpiringList<SocketInfo> deviceList;
 
 
     
@@ -45,8 +44,8 @@ public class Beacon
     /** Beacon callbacks */
     public interface OnBeaconEventListener  //TODO: rename this class
     {
-        /** Called when a new device response */
-        void onDeviceFound(InetAddress address);
+        /** Called when a new device respond to the beacon multicast */
+        void onDeviceFound(SocketInfo info);
 
         /** Called if an error occurs */
         void onFailure();
@@ -103,7 +102,7 @@ public class Beacon
                     switch (msg.what)
                     {
                         case MSG_WHAT_ADDRESS:
-                            onAddress((InetAddress) msg.obj);
+                            onDeviceFound((SocketInfo) msg.obj);
                             break;
 
                         case MSG_WHAT_ERROR:
@@ -140,9 +139,11 @@ public class Beacon
                     DatagramPacket request = new DatagramPacket(buff, buff.length);
                     receiverSocket.receive(request);
 
-                    if(request.getAddress() != null) //TODO: check for response
+                    InetAddress requestAddress = request.getAddress();
+                    if(requestAddress != null) //TODO: check for response
                     {
-                        mainHandler.obtainMessage(MSG_WHAT_ADDRESS, request.getAddress()).sendToTarget();
+                        SocketInfo info = new SocketInfo(requestAddress, requestAddress.getHostName());
+                        mainHandler.obtainMessage(MSG_WHAT_ADDRESS, info).sendToTarget();
                     }
                     else throw new AssertionError("Unexpected error");
 
@@ -181,13 +182,13 @@ public class Beacon
 // |==>  METHODS
 // |==============================
 
-    private void onAddress(InetAddress address)
+    private void onDeviceFound(SocketInfo info)
     {
-        if(deviceList.add(address))
+        if(deviceList.add(info))
         {
             Log.i(TAG, "Found new address");
 
-            if(eventListener != null) eventListener.onDeviceFound(address);
+            if(eventListener != null) eventListener.onDeviceFound(info);
         }
     }
 
@@ -203,8 +204,8 @@ public class Beacon
     {
         Set<String> devices = new HashSet<>();
 
-        for(InetAddress address : deviceList.getList())
-            devices.add(address.getHostAddress());
+        for(SocketInfo address : deviceList.getList())
+            devices.add(address.hostName);
 
         return devices;
     }
