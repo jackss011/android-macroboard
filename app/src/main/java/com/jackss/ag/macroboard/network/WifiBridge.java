@@ -6,6 +6,7 @@ import android.net.Network;
 import android.net.NetworkInfo;
 import android.support.annotation.NonNull;
 import android.util.Log;
+import com.jackss.ag.macroboard.settings.StaticSettings;
 
 import java.net.InetAddress;
 
@@ -41,16 +42,16 @@ public class WifiBridge extends NetBridge<InetAddress>
     {
         super(context);
 
-        tcpConnection = new TcpConnection(4545);
+        tcpConnection = new TcpConnection(StaticSettings.NET_PORT);
         tcpConnection.setTcpListener(tcpListener);
         udpSender = new UdpSender();
     }
 
     @Override
-    public boolean canStartConnection()
+    public boolean canStartConnection()  //TODO: useless function
     {
         return true;
-    } //TODO: useless function
+    }
 
     @Override
     public void startConnection(InetAddress address)

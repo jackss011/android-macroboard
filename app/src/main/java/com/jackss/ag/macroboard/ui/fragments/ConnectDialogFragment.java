@@ -5,7 +5,6 @@ import android.app.Dialog;
 import android.app.DialogFragment;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
@@ -14,8 +13,7 @@ import android.widget.ListView;
 import com.jackss.ag.macroboard.R;
 import com.jackss.ag.macroboard.network.Beacon;
 import com.jackss.ag.macroboard.network.SocketInfo;
-
-import java.net.InetAddress;
+import com.jackss.ag.macroboard.settings.StaticSettings;
 
 /**
  *
@@ -127,7 +125,7 @@ public class ConnectDialogFragment extends DialogFragment implements Beacon.OnBe
     private void postDeviceUpdate()
     {
         stopDeviceUpdate();
-        mHandler.postDelayed(updateDevicesTask, 3000); //TODO: hardcoded
+        mHandler.postDelayed(updateDevicesTask, StaticSettings.DEVICES_UPDATE_INTERVAL);
     }
 
     // Remove any update callback from the handler

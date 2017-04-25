@@ -4,6 +4,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
+import com.jackss.ag.macroboard.settings.StaticSettings;
 import com.jackss.ag.macroboard.utils.ExpiringList;
 
 import java.io.IOException;
@@ -62,18 +63,18 @@ public class Beacon
 
             try(MulticastSocket multicastSocket = new MulticastSocket())
             {
-                InetAddress group = InetAddress.getByName("228.5.6.7"); //TODO: hardcoded
+                InetAddress group = InetAddress.getByName(StaticSettings.BEACON_MULTICAST_ADDRESS);
                 multicastSocket.joinGroup(group);
 
                 while(true)
                 {
-                    String test = "test";
+                    String test = "test"; // TODO: response here
                     byte sending[] = test.getBytes(StandardCharsets.UTF_8);
-                    DatagramPacket packet = new DatagramPacket(sending, sending.length, group, 4545); //TODO: hardcoded
+                    DatagramPacket packet = new DatagramPacket(sending, sending.length, group, StaticSettings.NET_PORT);
 
                     multicastSocket.send(packet);
 
-                    try{ Thread.sleep(1000); } catch (InterruptedException e) { break; }
+                    try{ Thread.sleep(StaticSettings.BEACON_MULTICAST_INTERVAL); } catch (InterruptedException e) { break; }
                 }
             }
             catch (IOException e)
@@ -131,7 +132,7 @@ public class Beacon
 
             try
             {
-                receiverSocket = new DatagramSocket(4545);
+                receiverSocket = new DatagramSocket(StaticSettings.NET_PORT);
 
                 while(true)
                 {
@@ -173,7 +174,7 @@ public class Beacon
 
     public Beacon()
     {
-        deviceList = new ExpiringList<>(10);
+        deviceList = new ExpiringList<>(StaticSettings.BEACON_DEVICE_TIMEOUT);
     }
 
 

@@ -37,7 +37,7 @@ public class NetAdapter
         return false;
     }
 
-    NetBridge netBridge;
+    private NetBridge netBridge;
 
     public void startConnection(InetAddress address)
     {

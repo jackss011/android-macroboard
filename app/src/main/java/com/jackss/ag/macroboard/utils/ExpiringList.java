@@ -74,15 +74,6 @@ public class ExpiringList<T> implements Iterable<T>
             }
         }
 
-        // for(Map.Entry<T, Long> entry: map.entrySet())
-        // {
-        //     if(entry.getValue() <= systemTime)
-        //     {
-        //         map.remove(entry.getKey());
-        //         updated = true;
-        //     }
-        // }
-
         return updated;
     }
 

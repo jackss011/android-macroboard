@@ -3,6 +3,7 @@ package com.jackss.ag.macroboard.network;
 import android.os.*;
 import android.support.annotation.Nullable;
 import android.util.Log;
+import com.jackss.ag.macroboard.settings.StaticSettings;
 
 import java.io.*;
 import java.net.InetAddress;
@@ -366,7 +367,7 @@ public class TcpConnection
 
             connectionTask = new ClientConnectionTask();
             setTcpState(TcpState.CONNECTING);
-            connectionTask.execute(new SocketInfo(address, 4545));
+            connectionTask.execute(new SocketInfo(address, StaticSettings.NET_PORT));
 
             return true;
         }
