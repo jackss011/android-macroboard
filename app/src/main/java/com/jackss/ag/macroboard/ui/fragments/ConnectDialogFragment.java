@@ -163,6 +163,7 @@ public class ConnectDialogFragment extends DialogFragment implements Beacon.OnBe
     public void onDeviceFound(SocketInfo socketInfo)
     {
         updateDevices();
+        postDeviceUpdate();
     }
 
     @Override
