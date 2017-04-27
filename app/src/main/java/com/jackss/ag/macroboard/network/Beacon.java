@@ -156,9 +156,10 @@ public class Beacon
             catch (Exception e)
             {
                 if(receiverSocket != null && !receiverSocket.isClosed())
+                {
                     mainHandler.sendEmptyMessage(MSG_WHAT_ERROR);
-
-                e.printStackTrace();
+                    e.printStackTrace();
+                }
             }
             finally
             {
