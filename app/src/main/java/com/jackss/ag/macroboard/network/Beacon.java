@@ -201,15 +201,10 @@ public class Beacon
         stopBroadcast();
         if(eventListener != null) eventListener.onFailure();
     }
-
-    public Set<String> getDevicesAsStrings()
+    
+    public Set<SocketInfo> getDevicesList()
     {
-        Set<String> devices = new HashSet<>();
-
-        for(SocketInfo address : deviceList.getList())
-            devices.add(address.hostName);
-
-        return devices;
+        return new HashSet<>(deviceList.getList());
     }
 
     /** Set listener for beacon events */

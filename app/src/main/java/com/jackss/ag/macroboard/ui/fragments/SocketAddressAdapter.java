@@ -10,12 +10,15 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 import com.jackss.ag.macroboard.R;
+import com.jackss.ag.macroboard.network.SocketInfo;
+
+import java.net.Socket;
 
 
 /**
  *
  */
-class SocketAddressAdapter extends ArrayAdapter<String>
+class SocketAddressAdapter extends ArrayAdapter<SocketInfo>
 {
     SocketAddressAdapter(@NonNull Context context)//, @LayoutRes int resource)
     {
@@ -31,7 +34,8 @@ class SocketAddressAdapter extends ArrayAdapter<String>
                 : convertView;
 
         TextView label = (TextView) view.findViewById(R.id.connect_device_text);
-        label.setText(getItem(position));
+        SocketInfo item = getItem(position);
+        label.setText(item != null ? item.hostName : "Error");
 
         return view;
     }

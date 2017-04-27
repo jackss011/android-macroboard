@@ -5,6 +5,7 @@ import android.app.Dialog;
 import android.app.DialogFragment;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
@@ -125,7 +126,7 @@ public class ConnectDialogFragment extends DialogFragment implements Beacon.OnBe
     private void postDeviceUpdate()
     {
         stopDeviceUpdate();
-        mHandler.postDelayed(updateDevicesTask, StaticSettings.DEVICES_UPDATE_INTERVAL);
+        mHandler.postDelayed(updateDevicesTask, StaticSettings.DEVICES_UPDATE_INTERVAL * 1000);
     }
 
     // Remove any update callback from the handler
@@ -135,11 +136,11 @@ public class ConnectDialogFragment extends DialogFragment implements Beacon.OnBe
     }
 
     // Called when a device int the list is clicked
-    private void deviceClicked(String address)
+    private void deviceClicked(SocketInfo info)
     {
-        if(address == null) throw new AssertionError("Selected null address");
+        if(info == null) throw new AssertionError("Selected null address");
 
-        if(dialogEventListener != null) dialogEventListener.onDialogConnectRequest(address);
+        if(dialogEventListener != null) dialogEventListener.onDialogConnectRequest(info.address);
         dismiss();
     }
 
@@ -153,7 +154,7 @@ public class ConnectDialogFragment extends DialogFragment implements Beacon.OnBe
     private void updateDevices()
     {
         adapter.clear();
-        adapter.addAll(beacon.getDevicesAsStrings());
+        adapter.addAll(beacon.getDevicesList());
         updateUI();
     }
 
