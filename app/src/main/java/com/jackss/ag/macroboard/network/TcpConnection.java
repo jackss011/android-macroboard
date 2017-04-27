@@ -28,7 +28,7 @@ public class TcpConnection
 
     private Socket clientSocket;
 
-    private AsyncTask connectionTask;      // AsyncTask used to produce a connected socket
+    private ClientConnectionTask connectionTask;      // AsyncTask used to produce a connected socket
 
     private Thread inputThread;                 // Thread listening for input_stream data
 
@@ -75,12 +75,12 @@ public class TcpConnection
 
 
     /** Struct containing address and port */
-    private class SocketInfo
+    private static class ConnectionInfo
     {
         InetAddress address;
         int port;
 
-        SocketInfo(InetAddress address, int port)
+        ConnectionInfo(InetAddress address, int port)
         {
             this.address = address;
             this.port = port;
@@ -119,16 +119,16 @@ public class TcpConnection
     }
 
 
-    private class ClientConnectionTask extends AsyncTask<SocketInfo, Void, Socket>
+    private class ClientConnectionTask extends AsyncTask<ConnectionInfo, Void, Socket>
     {
         @Override
-        protected Socket doInBackground(SocketInfo... args)
+        protected Socket doInBackground(ConnectionInfo... args)
         {
-            SocketInfo info = args[0];
+            ConnectionInfo info = args[0];
 
-            try(Socket socket = new Socket(info.address, info.port))
+            try
             {
-                return socket;
+                return new Socket(info.address, info.port);
             }
             catch (IOException e)
             {
@@ -367,7 +367,7 @@ public class TcpConnection
 
             connectionTask = new ClientConnectionTask();
             setTcpState(TcpState.CONNECTING);
-            connectionTask.execute(new SocketInfo(address, StaticSettings.NET_PORT));
+            connectionTask.execute(new ConnectionInfo(address, StaticSettings.NET_PORT));
 
             return true;
         }
