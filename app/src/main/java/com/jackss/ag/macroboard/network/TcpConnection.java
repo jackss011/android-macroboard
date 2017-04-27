@@ -215,7 +215,7 @@ public class TcpConnection
             }
             catch (Exception e)
             {
-                e.printStackTrace();
+                if(!clientSocket.isClosed()) e.printStackTrace();
                 sendErrorMessage();
             }
         }
