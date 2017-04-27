@@ -1,10 +1,6 @@
 package com.jackss.ag.macroboard.network;
 
 import android.content.Context;
-import android.net.ConnectivityManager;
-import android.net.Network;
-import android.net.NetworkInfo;
-import android.support.annotation.NonNull;
 import android.util.Log;
 import com.jackss.ag.macroboard.settings.StaticSettings;
 
@@ -33,7 +29,21 @@ public class WifiBridge extends NetBridge<InetAddress>
         @Override
         public void onConnectionStateChanged(TcpConnection.TcpState newState)
         {
-            setConnectionState(ConnectionState.values()[newState.ordinal()]);       //TODO: non-safe enum transposition
+            switch (newState)
+            {
+                case IDLE:
+                    setConnectionState(BridgeState.IDLE);
+                    break;
+                case CONNECTING:
+                    setConnectionState(BridgeState.CONNECTING);
+                    break;
+                case CONNECTED:
+                    setConnectionState(BridgeState.CONNECTED);
+                    break;
+                case ERROR:
+                    setConnectionState(BridgeState.ERROR);
+                    break;
+            }
         }
     };
 
@@ -48,9 +58,9 @@ public class WifiBridge extends NetBridge<InetAddress>
     }
 
     @Override
-    public boolean canStartConnection()  //TODO: useless function
+    public boolean canStartConnection()
     {
-        return true;
+        return tcpConnection.canStartConnection();
     }
 
     @Override
@@ -69,7 +79,7 @@ public class WifiBridge extends NetBridge<InetAddress>
     @Override
     public boolean isConnected()
     {
-        return tcpConnection.getTcpState() == TcpConnection.TcpState.CONNECTED;
+        return getConnectionState() == BridgeState.CONNECTED;
     }
 
     @Override

@@ -2,6 +2,7 @@ package com.jackss.ag.macroboard.network;
 
 import android.app.Activity;
 import android.support.annotation.NonNull;
+import android.util.Log;
 import com.jackss.ag.macroboard.ui.fragments.ConnectDialogFragment;
 
 import java.net.InetAddress;
@@ -12,6 +13,7 @@ import java.net.UnknownHostException;
  */
 public class NetAdapter
 {
+    private static final String TAG = "NetAdapter";
 
 // |===============================
 // |==>  STATIC MEMBERS
@@ -50,7 +52,7 @@ public class NetAdapter
     NetBridge.OnConnectionStateListener networkListener = new NetBridge.OnConnectionStateListener()
     {
         @Override
-        public void onConnectionStateChanged(NetBridge.ConnectionState newState)
+        public void onConnectionStateChanged(NetBridge.BridgeState newState)
         {
             switch (newState)
             {
@@ -121,7 +123,10 @@ public class NetAdapter
 
     public void connectDialog(Activity activity)
     {
-        connectDialogFragment.show(activity.getFragmentManager(), null);
+        if(!isConnected())
+            connectDialogFragment.show(activity.getFragmentManager(), null);
+        else
+            Log.e(TAG, "Socket is already connected");
     }
 
     public void disconnect()
@@ -129,6 +134,11 @@ public class NetAdapter
         connectDialogFragment.dismiss();
 
         netBridge.stopConnection();
+    }
+
+    public boolean isConnected()
+    {
+        return netBridge.getConnectionState() == NetBridge.BridgeState.CONNECTED;
     }
 
     public void registerListener(@NonNull OnNetworkEventListener listener)

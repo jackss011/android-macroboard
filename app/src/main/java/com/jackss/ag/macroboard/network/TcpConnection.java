@@ -227,51 +227,13 @@ public class TcpConnection
 // |==>  METHODS
 // |===============================
 
-    // Internal set tcp state. Call the listener if a change occurred
-    private void setTcpState(TcpState newState)
-    {
-        if(getTcpState() != newState)
-        {
-            this.tcpState = newState;
-            if(tcpListener != null) tcpListener.onConnectionStateChanged(getTcpState());
-
-            Log.v(TAG, "Moving to state: " + newState.name());
-        }
-    }
-
-    /** Get the state of this TCP connection. */
-    public TcpState getTcpState()
-    {
-        return tcpState;
-    }
-
-    /** Set the listener notified of data receiving and connection state change. */
-    public void setTcpListener(@Nullable OnTcpListener tcpListener)
-    {
-        this.tcpListener = tcpListener;
-
-        if(tcpListener != null) tcpListener.onConnectionStateChanged(getTcpState());
-    }
-
-    /** If isConnected() equals true return the socket address, return null otherwise. */
-    public InetAddress getConnectedAddress()
-    {
-        return isConnected() ? clientSocket.getInetAddress() : null;
-    }
-
-    /** Get the port used by this connection. */
-    public int getPort()
-    {
-        return port;
-    }
-
     // Called from ConnectionTask.onPostExecute(socket) when connection is finished
     private void onConnectionResult(Socket socket)
     {
         clientSocket = socket;
         connectionTask = null;
 
-        if(isConnected())
+        if(isSocketConnected())
         {
             onConnected();
         }
@@ -313,7 +275,7 @@ public class TcpConnection
     {
         // "throw" an error only if the socket wasn't intentionally closed using Socket.close()
         //  since it means it is not an unexpected event
-        if(isConnected()) onError();
+        if(isSocketConnected()) onError();
     }
 
     // Called internally when an error occurs
@@ -326,6 +288,50 @@ public class TcpConnection
     private void onDataReceived(String data)
     {
         if(tcpListener != null) tcpListener.onData(data);
+    }
+
+    // Internal set tcp state. Call the listener if a change occurred
+    private void setTcpState(TcpState newState)
+    {
+        if(getTcpState() != newState)
+        {
+            this.tcpState = newState;
+            if(tcpListener != null) tcpListener.onConnectionStateChanged(getTcpState());
+
+            Log.v(TAG, "Moving to state: " + newState.name());
+        }
+    }
+
+    /** Get the state of this TCP connection. */
+    public TcpState getTcpState()
+    {
+        return tcpState;
+    }
+
+    /** Set the listener notified of data receiving and connection state change. */
+    public void setTcpListener(@Nullable OnTcpListener tcpListener)
+    {
+        this.tcpListener = tcpListener;
+
+        if(tcpListener != null) tcpListener.onConnectionStateChanged(getTcpState());
+    }
+
+    /** If isSocketConnected() equals true return the socket address, return null otherwise. */
+    public InetAddress getConnectedAddress()
+    {
+        return isSocketConnected() ? clientSocket.getInetAddress() : null;
+    }
+
+    /** Get the port used by this connection. */
+    public int getPort()
+    {
+        return port;
+    }
+
+    /** Return true if the connection is valid */
+    public boolean isConnected()
+    {
+        return getTcpState() == TcpState.CONNECTED;
     }
 
     /** Return true if is currently try to connect, false otherwise. */
@@ -343,15 +349,15 @@ public class TcpConnection
      *       Only writing or reading from its streams determine if a socket is actually connected or not.
      *       TcpListener.onConnectionStateChange(TcpState.ERROR) is called (on the main thread) when such operations fail.
      */
-    private boolean isConnected()       //TODO: get rid off this function
+    public boolean isSocketConnected()
     {
         return clientSocket != null && clientSocket.isConnected();
     }
 
     /** Check whenever calling startConnection will actually start a connection */
-    public boolean canStartConnection()  //TODO: improve this
+    public boolean canStartConnection()
     {
-        return !isConnecting();
+        return getTcpState() == TcpState.IDLE;
     }
 
     /**
@@ -425,7 +431,7 @@ public class TcpConnection
      */
     public void sendData(String data)
     {
-        if(isConnected())   //TODO: should use getState()?
+        if(isSocketConnected())   //TODO: should use getState()?
         {
             if(outputPrinter != null)
                 outputPrinter.println(data);

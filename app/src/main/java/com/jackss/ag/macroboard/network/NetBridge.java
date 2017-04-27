@@ -15,7 +15,7 @@ abstract public class NetBridge<T>
         UNRELIABLE
     }
 
-    public enum ConnectionState
+    public enum BridgeState
     {
         IDLE,
         CONNECTING,
@@ -25,14 +25,14 @@ abstract public class NetBridge<T>
 
     public interface OnConnectionStateListener
     {
-        void onConnectionStateChanged(ConnectionState newState);
+        void onConnectionStateChanged(BridgeState newState);
     }
 
     private Context context;
 
     private OnConnectionStateListener connectionStateListener;
 
-    private ConnectionState connectionState;
+    private BridgeState connectionState;
 
 
     public NetBridge(Context context)
@@ -65,7 +65,7 @@ abstract public class NetBridge<T>
         if(connectionStateListener != null) connectionStateListener.onConnectionStateChanged(getConnectionState());
     }
 
-    protected void setConnectionState(ConnectionState state)
+    protected void setConnectionState(BridgeState state)
     {
         if(this.connectionState != state)
         {
@@ -76,7 +76,7 @@ abstract public class NetBridge<T>
         Log.v("NetBridge", "Moving to state: " + state.name());
     }
 
-    public ConnectionState getConnectionState()
+    public BridgeState getConnectionState()
     {
         return connectionState;
     }
