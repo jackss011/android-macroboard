@@ -143,7 +143,7 @@ public class Beacon
                     InetAddress requestAddress = request.getAddress();
                     if(requestAddress != null) //TODO: check for response
                     {
-                        SocketInfo info = new SocketInfo(requestAddress, requestAddress.getHostName());
+                        SocketInfo info = new SocketInfo(requestAddress.getHostAddress(), requestAddress.getHostName());
                         mainHandler.obtainMessage(MSG_WHAT_ADDRESS, info).sendToTarget();
                     }
                     else throw new AssertionError("Unexpected error");
