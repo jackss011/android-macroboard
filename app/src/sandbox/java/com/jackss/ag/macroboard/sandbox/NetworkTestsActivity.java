@@ -7,14 +7,13 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import com.jackss.ag.macroboard.R;
-import com.jackss.ag.macroboard.network.Beacon;
-import com.jackss.ag.macroboard.network.NetBridge;
-import com.jackss.ag.macroboard.network.WifiBridge;
+import com.jackss.ag.macroboard.network.*;
 import com.jackss.ag.macroboard.ui.fragments.ConnectDialogFragment;
 
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 
-public class NetworkTestsActivity extends AppCompatActivity implements NetBridge.OnConnectionStateListener, ConnectDialogFragment.OnConnectDialogEventListener
+public class NetworkTestsActivity extends AppCompatActivity implements NetAdapter.OnNetworkEventListener
 {
     private static final String TAG = "NetworkTestsActivity";
 
@@ -23,7 +22,7 @@ public class NetworkTestsActivity extends AppCompatActivity implements NetBridge
     private Button send;
     private TextView result;
 
-    ConnectDialogFragment connectDialogFragment;
+    NetAdapter netAdapter;
 
 
     @Override
@@ -37,51 +36,52 @@ public class NetworkTestsActivity extends AppCompatActivity implements NetBridge
         send = (Button) findViewById(R.id.sandbox_send);
         result = (TextView) findViewById(R.id.sandbox_result);
 
-
+        netAdapter = NetAdapter.getInstance();
     }
 
     public void onClick(View view)
     {
         if(view.equals(start))
         {
-            showDialog();
+            netAdapter.connectDialog(this);
         }
-        // else if(view.equals(stop))
-        // {
-        //
-        // }
-        // else if(view.equals(send))
-        // {
-        //
-        // }
-    }
-
-    @Override
-    public void onConnectionStateChanged(NetBridge.ConnectionState newState)
-    {
-        result.setText(newState.name());
-    }
-
-    private void showDialog()
-    {
-        if(connectDialogFragment == null)
+        else if(view.equals(stop))
         {
-            connectDialogFragment = new ConnectDialogFragment();
-            connectDialogFragment.setDialogEventListener(this);
+            netAdapter.disconnect();
         }
+        else if(view.equals(send))
+        {
 
-        connectDialogFragment.show(getFragmentManager(), null);
+        }
     }
+
 
     @Override
     protected void onStart()
     {
         super.onStart();
+
+        netAdapter.registerListener(this);
     }
 
     @Override
-    public void onDialogConnectRequest(String address)
+    protected void onStop()
     {
-        Log.d(TAG, "Connect request to: " + address);
+        super.onStop();
+
+        netAdapter.unregisterListener();
+    }
+
+    @Override
+    public void onNetworkStateChanged(NetAdapter.State newState)
+    {
+        result.setText(newState.name());
+    }
+
+    @Override
+    public void onNetworkFailure()
+    {
+        Log.e(TAG, "Net failure");
+        result.setText("Failure");
     }
 }
