@@ -2,10 +2,7 @@ package com.jackss.ag.macroboard.utils;
 
 import android.os.SystemClock;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 
 /**
@@ -35,14 +32,11 @@ public class ExpiringList<T> implements Iterable<T>
         if(timeout <= 0) throw new IllegalArgumentException("timeout is minor than 0");
 
         long expireTime = getAbsoluteTime() + timeout * 1000;
-        boolean isNewItem = map.put(item, expireTime) == null;
-        update();
-
-        return isNewItem;
+        return map.put(item, expireTime) == null;
     }
 
     /**
-     * Add an item to the map and using default timeout
+     * Add an item to the map and using default timeout passed in the constructor.
      * @param item the item to add
      * @return return true if the item wasn't already in the map
      */
@@ -51,18 +45,17 @@ public class ExpiringList<T> implements Iterable<T>
         return add(item, defaultTimeout);
     }
 
-    /** Return true if the item is in the map. Sanitize the map */
+    /** Return true if the item is in the map. update() should be called before this. */
     public boolean contains(T item)
     {
-        update();
         return map.containsKey(item);
     }
 
-    /** Remove every expired entry */
-    public boolean update()
+    /** Remove every expired entry, returning a Set containing removed objects. */
+    public Set<T> update()
     {
         final long systemTime = getAbsoluteTime();
-        boolean updated = false;
+        Set<T> removed = new HashSet<>();
 
         for(Iterator<Map.Entry<T, Long>> it = map.entrySet().iterator(); it.hasNext(); )
         {
@@ -70,30 +63,28 @@ public class ExpiringList<T> implements Iterable<T>
             if(entry.getValue() <= systemTime)
             {
                 it.remove();
-                updated = true;
+                removed.add(entry.getKey());
             }
         }
 
-        return updated;
+        return removed.size() > 0 ? removed : null;
     }
 
-    /** Reset the map */
+    /** Remove all entries */
     public void clear()
     {
         map.clear();
     }
 
-    /** Get a {@link Set} of the contained non-expired values */
+    /** Get a {@link Set} of the contained values. update() should be called before. */
     public Set<T> getList()
     {
-        update();
         return map.keySet();
     }
 
     @Override
     public Iterator<T> iterator()
     {
-        update();
         return map.keySet().iterator();
     }
 

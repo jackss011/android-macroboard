@@ -32,7 +32,7 @@ public class Beacon
     private Thread receiverThread;
     private ReceiverTask receiverTask;
 
-    private OnBeaconEventListener eventListener;
+    private OnEventListener eventListener;
 
     private ExpiringList<SocketInfo> deviceList;
 
@@ -43,13 +43,19 @@ public class Beacon
 // |===============================
 
     /** Beacon callbacks */
-    public interface OnBeaconEventListener  //TODO: rename this class
+    public interface OnEventListener
     {
         /** Called when a new device respond to the beacon multicast */
         void onDeviceFound(SocketInfo info);
 
+        /**
+         * Called after updateDevices() if at least one device is removed.
+         * @param  infoSet a Set containing the removed devices
+         */
+        void onDevicesTimeout(Set<SocketInfo> infoSet);
+
         /** Called if an error occurs */
-        void onFailure();
+        void onBeaconFailure();
     }
 
 
@@ -107,7 +113,7 @@ public class Beacon
                             break;
 
                         case MSG_WHAT_ERROR:
-                            onError();
+                            onFailure();
                             break;
 
                         default:
@@ -194,23 +200,31 @@ public class Beacon
         }
     }
 
-    private void onError()
+    private void onFailure()
     {
         Log.i(TAG, "Unknown error occurred");
 
         stopBroadcast();
-        if(eventListener != null) eventListener.onFailure();
-    }
-    
-    public Set<SocketInfo> getDevicesList()
-    {
-        return new HashSet<>(deviceList.getList());
+        if(eventListener != null) eventListener.onBeaconFailure();
     }
 
     /** Set listener for beacon events */
-    public void setBeaconListener(OnBeaconEventListener listener)
+    public void setBeaconListener(OnEventListener listener)
     {
         this.eventListener = listener;
+    }
+
+    /** Update the devices in the list. OnEventListener.onDevicesTimeout(infoSet) is called if any device is removed. */
+    public void updateDevices()
+    {
+        Set<SocketInfo> removed = deviceList.update();
+
+        if(removed != null && eventListener != null) eventListener.onDevicesTimeout(removed);
+    }
+
+    public Set<SocketInfo> getDevicesList()
+    {
+        return new HashSet<>(deviceList.getList());
     }
 
     /** Is currently sending packets? */

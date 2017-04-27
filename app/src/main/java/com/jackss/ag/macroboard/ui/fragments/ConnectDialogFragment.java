@@ -5,7 +5,6 @@ import android.app.Dialog;
 import android.app.DialogFragment;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
@@ -16,10 +15,12 @@ import com.jackss.ag.macroboard.network.Beacon;
 import com.jackss.ag.macroboard.network.SocketInfo;
 import com.jackss.ag.macroboard.settings.StaticSettings;
 
+import java.util.Set;
+
 /**
  *
  */
-public class ConnectDialogFragment extends DialogFragment implements Beacon.OnBeaconEventListener
+public class ConnectDialogFragment extends DialogFragment implements Beacon.OnEventListener
 {
     private static final String TAG = "ConnectDialogFragment";
 
@@ -28,10 +29,10 @@ public class ConnectDialogFragment extends DialogFragment implements Beacon.OnBe
     private ListView deviceList;
     private SocketAddressAdapter adapter;
 
+    private OnConnectDialogEventListener dialogEventListener;
+
     private Handler mHandler;
     private Runnable updateDevicesTask;
-
-    private OnConnectDialogEventListener dialogEventListener;
 
 
 // |==============================
@@ -113,16 +114,36 @@ public class ConnectDialogFragment extends DialogFragment implements Beacon.OnBe
         super.onStop();
 
         beacon.stopBroadcast();
+        adapter.clear();
         stopDeviceUpdate();
     }
 
-    /** Set an event used to list for connect requests */
-    public void setDialogEventListener(OnConnectDialogEventListener dialogEventListener)
+    @Override
+    public void onDeviceFound(SocketInfo socketInfo)
     {
-        this.dialogEventListener = dialogEventListener;
+        adapter.add(socketInfo);
+        updateUI();
+        postDeviceUpdate();
     }
 
-    // Schedule an update in the handler and remove any previous one.
+    @Override
+    public void onDevicesTimeout(Set<SocketInfo> infoSet)
+    {
+        for(SocketInfo info : infoSet)
+        {
+            adapter.remove(info);
+        }
+        updateUI();
+        postDeviceUpdate();
+    }
+
+    @Override
+    public void onBeaconFailure()
+    {
+        throw new AssertionError("Beacon failed");
+    }
+
+    // Schedule an update_task in the handler and remove any previous one.
     private void postDeviceUpdate()
     {
         stopDeviceUpdate();
@@ -153,21 +174,12 @@ public class ConnectDialogFragment extends DialogFragment implements Beacon.OnBe
     // Fetch devices from the beacon and add them to the adapter
     private void updateDevices()
     {
-        adapter.clear();
-        adapter.addAll(beacon.getDevicesList());
-        updateUI();
+        beacon.updateDevices();
     }
 
-    @Override
-    public void onDeviceFound(SocketInfo socketInfo)
+    /** Set an event used to list for connect requests */
+    public void setDialogEventListener(OnConnectDialogEventListener dialogEventListener)
     {
-        updateDevices();
-        postDeviceUpdate();
-    }
-
-    @Override
-    public void onFailure()
-    {
-        throw new AssertionError("Beacon failed");
+        this.dialogEventListener = dialogEventListener;
     }
 }
