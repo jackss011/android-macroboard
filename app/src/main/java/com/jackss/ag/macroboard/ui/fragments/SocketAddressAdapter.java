@@ -10,6 +10,7 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 import com.jackss.ag.macroboard.R;
 import com.jackss.ag.macroboard.network.wifi.SocketInfo;
+import com.jackss.ag.macroboard.utils.StaticLibrary;
 
 
 /**
@@ -32,7 +33,7 @@ class SocketAddressAdapter extends ArrayAdapter<SocketInfo>
 
         TextView label = (TextView) view.findViewById(R.id.connect_device_text);
         SocketInfo item = getItem(position);
-        label.setText(item != null ? item.hostName : "Error");
+        label.setText(item != null ? StaticLibrary.sanitizeHostName(item.hostName) : "Error");
 
         return view;
     }

@@ -61,4 +61,11 @@ public class StaticLibrary
             }
         };
     }
+
+    /** Remove every char after the first dot. Prevent wifi modems to modify socket names. */
+    public static String sanitizeHostName(String hostName)
+    {
+        String res[] = hostName.split("\\.");
+        return res.length > 0 ? res[0] : hostName;
+    }
 }
