@@ -18,7 +18,7 @@ import android.widget.TextView;
 import com.jackss.ag.macroboard.R;
 import com.jackss.ag.macroboard.utils.BubbleGenerator;
 import com.jackss.ag.macroboard.utils.ButtonDetector;
-import com.jackss.ag.macroboard.utils.MBUtils;
+import com.jackss.ag.macroboard.utils.StaticLibrary;
 
 
 /**
@@ -91,7 +91,7 @@ public class BottomNavigationItem extends FrameLayout
     {
         layout = new LinearLayout(getContext());
         layout.setOrientation(LinearLayout.VERTICAL);
-        layout.setPadding(0, MBUtils.dp2px(TOP_PADDING_DP), 0, MBUtils.dp2px(BOTTOM_PADDING_DP));
+        layout.setPadding(0, StaticLibrary.dp2px(TOP_PADDING_DP), 0, StaticLibrary.dp2px(BOTTOM_PADDING_DP));
 
         icon = new ImageView(getContext());
 
@@ -100,7 +100,7 @@ public class BottomNavigationItem extends FrameLayout
         label.setTextAlignment(TEXT_ALIGNMENT_CENTER);
         label.setTextSize(TypedValue.COMPLEX_UNIT_SP, TEXT_SIZE_SP);
 
-        layout.addView(icon, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, MBUtils.dp2px(ICON_SIZE_DP)));
+        layout.addView(icon, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, StaticLibrary.dp2px(ICON_SIZE_DP)));
         layout.addView(label, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
 
         addView(layout, new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));

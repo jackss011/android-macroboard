@@ -11,7 +11,7 @@ import java.util.concurrent.ThreadFactory;
 /**
  *  Static library for generic methods
  */
-public class MBUtils
+public class StaticLibrary
 {
     /** Convert dp to px */
     public static int dp2px(float dp)

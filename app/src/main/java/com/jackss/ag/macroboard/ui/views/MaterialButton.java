@@ -30,8 +30,8 @@ public class MaterialButton extends View
 
     // XML attrs
     int backgroundColor = Color.GRAY;
-    float cornerRadius = MBUtils.dp2px(2);
-    int iconSize = MBUtils.dp2px(24);
+    float cornerRadius = StaticLibrary.dp2px(2);
+    int iconSize = StaticLibrary.dp2px(24);
     float backgroundSaturationMultiplier = 0.85f;
 
     // Background press effects
@@ -113,7 +113,7 @@ public class MaterialButton extends View
 
         if(icon == null) icon = getResources().getDrawable(R.drawable.ic_test_icon, null);
 
-        backgroundPressedColor = MBUtils.saturateColor(backgroundColor, backgroundSaturationMultiplier);
+        backgroundPressedColor = StaticLibrary.saturateColor(backgroundColor, backgroundSaturationMultiplier);
         backgroundColorEvaluator = new CachedArgbEvaluator(backgroundColor, backgroundPressedColor);
 
         initGraphics();
@@ -176,13 +176,13 @@ public class MaterialButton extends View
     {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
 
-        final int desiredSize = MBUtils.dp2px(DESIRED_BACKGROUND_DP);
+        final int desiredSize = StaticLibrary.dp2px(DESIRED_BACKGROUND_DP);
 
         final int desiredW = desiredSize + getPaddingLeft() + getPaddingRight();
         final int desiredH = desiredSize + getPaddingTop() + getPaddingBottom();
 
-        int measuredW = MBUtils.resolveDesiredMeasure(widthMeasureSpec, desiredW);
-        int measuredH = MBUtils.resolveDesiredMeasure(heightMeasureSpec, desiredH);
+        int measuredW = StaticLibrary.resolveDesiredMeasure(widthMeasureSpec, desiredW);
+        int measuredH = StaticLibrary.resolveDesiredMeasure(heightMeasureSpec, desiredH);
 
         setMeasuredDimension(measuredW, measuredH);
     }
