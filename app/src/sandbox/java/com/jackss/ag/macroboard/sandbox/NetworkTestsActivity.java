@@ -71,6 +71,14 @@ public class NetworkTestsActivity extends AppCompatActivity implements NetAdapte
     }
 
     @Override
+    protected void onDestroy()
+    {
+        super.onDestroy();
+
+        netAdapter.disconnect();
+    }
+
+    @Override
     public void onNetworkStateChanged(NetAdapter.State newState)
     {
         result.setText(newState.name());
@@ -80,6 +88,6 @@ public class NetworkTestsActivity extends AppCompatActivity implements NetAdapte
     public void onNetworkFailure()
     {
         Log.e(TAG, "Net failure");
-        result.setText("Failure");
+        result.setText(String.valueOf("Error"));
     }
 }

@@ -259,6 +259,7 @@ public class TcpConnection
 
             if(inputThread != null) inputThread.interrupt();
             inputThread = new Thread(new InputHandler(clientSocket));
+            inputThread.setDaemon(true);
             inputThread.start();
 
             setTcpState(TcpState.CONNECTED);
@@ -279,7 +280,7 @@ public class TcpConnection
     }
 
     // Called internally when an error occurs
-    private void onError()      //TODO: maybe use error types
+    private void onError()      //TODO: maybe reset
     {
         setTcpState(TcpState.ERROR);
     }
@@ -335,7 +336,7 @@ public class TcpConnection
     }
 
     /** Return true if is currently try to connect, false otherwise. */
-    private boolean isConnecting()
+    private boolean isConnecting()  //TODO: can use TcpState
     {
         return  connectionTask != null                                          // valid ref
                 && connectionTask.getStatus() == AsyncTask.Status.RUNNING       // task running
@@ -431,7 +432,7 @@ public class TcpConnection
      */
     public void sendData(String data)
     {
-        if(isSocketConnected())   //TODO: should use getState()?
+        if(isSocketConnected())   //TODO: change this
         {
             if(outputPrinter != null)
                 outputPrinter.println(data);

@@ -1,7 +1,6 @@
 package com.jackss.ag.macroboard.network;
 
 import android.support.annotation.NonNull;
-import android.view.View;
 
 /**
  *
@@ -23,17 +22,13 @@ public class Sender
     }
 
 
-    View.OnClickListener mCopyClickListener = new View.OnClickListener()
-    {
-        @Override
-        public void onClick(View v)
-        {
-            sendListener.sendData(Packager.packActionCopy(), NetBridge.DataReliability.RELIABLE);
-        }
-    };
-
     public void sendTest(NetBridge.DataReliability reliability)
     {
         sendListener.sendData("Test from Sender", reliability);
+    }
+
+    public void sendActionCopy()
+    {
+        sendListener.sendData(Packager.packActionCopy(), NetBridge.DataReliability.RELIABLE);
     }
 }

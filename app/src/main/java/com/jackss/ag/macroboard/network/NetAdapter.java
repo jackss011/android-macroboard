@@ -38,7 +38,8 @@ public class NetAdapter implements Sender.OnSendListener
     {
         IDLE,
         CONNECTING,
-        CONNECTED
+        CONNECTED,
+        ERROR
     }
 
 
@@ -50,7 +51,7 @@ public class NetAdapter implements Sender.OnSendListener
     }
 
 
-    NetBridge.OnConnectionStateListener networkListener = new NetBridge.OnConnectionStateListener()
+    NetBridge.OnConnectionStateListener bridgeListener = new NetBridge.OnConnectionStateListener()
     {
         @Override
         public void onConnectionStateChanged(NetBridge.BridgeState newState)
@@ -58,18 +59,20 @@ public class NetAdapter implements Sender.OnSendListener
             switch (newState)
             {
                 case IDLE:
-                    if (listener != null) listener.onNetworkStateChanged(State.IDLE);
+                    state = State.IDLE;
                     break;
                 case CONNECTING:
-                    if (listener != null) listener.onNetworkStateChanged(State.CONNECTING);
+                    state = State.CONNECTING;
                     break;
                 case CONNECTED:
-                    if (listener != null) listener.onNetworkStateChanged(State.CONNECTED);
+                    state = State.CONNECTED;
                     break;
                 case ERROR:
-                    failure();
+                    state = State.ERROR;
                     break;
             }
+
+            notifyNetworkState();
         }
     };
 
@@ -97,6 +100,8 @@ public class NetAdapter implements Sender.OnSendListener
 // |==>  FIELDS
 // |===============================
 
+    private State state;
+
     private WifiBridge netBridge;
 
     private ConnectDialogFragment connectDialogFragment;
@@ -113,7 +118,7 @@ public class NetAdapter implements Sender.OnSendListener
     private NetAdapter()
     {
         netBridge = new WifiBridge(null);
-        netBridge.setConnectionStateListener(networkListener);
+        netBridge.setConnectionStateListener(bridgeListener);
 
         connectDialogFragment = new ConnectDialogFragment();
         connectDialogFragment.setDialogEventListener(connectionDialogListener);
@@ -126,9 +131,15 @@ public class NetAdapter implements Sender.OnSendListener
 // |==>  METHODS
 // |===============================
 
-    private void failure()
+    private void notifyNetworkState()
     {
-        if(listener != null) listener.onNetworkFailure();
+        if(listener != null)
+        {
+            if(getNetworkState() == State.ERROR)
+                listener.onNetworkFailure();
+            else
+                listener.onNetworkStateChanged(getNetworkState());
+        }
     }
 
     @Override
@@ -160,11 +171,17 @@ public class NetAdapter implements Sender.OnSendListener
     public void registerListener(@NonNull OnNetworkEventListener listener)
     {
         this.listener = listener;
+        notifyNetworkState();
     }
 
     public void unregisterListener()
     {
         this.listener = null;
+    }
+
+    public State getNetworkState()
+    {
+        return state;
     }
 
     public Sender getSender()
