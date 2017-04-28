@@ -12,7 +12,7 @@ import java.net.UnknownHostException;
 /**
  *
  */
-public class NetAdapter
+public class NetAdapter implements Sender.OnSendListener
 {
     private static final String TAG = "NetAdapter";
 
@@ -103,6 +103,8 @@ public class NetAdapter
 
     private OnNetworkEventListener listener;
 
+    private Sender sender;
+
 
 // |===============================
 // |==>  CONSTRUCTORS
@@ -115,12 +117,25 @@ public class NetAdapter
 
         connectDialogFragment = new ConnectDialogFragment();
         connectDialogFragment.setDialogEventListener(connectionDialogListener);
+
+        sender = new Sender(this);
     }
 
 
 // |===============================
 // |==>  METHODS
 // |===============================
+
+    private void failure()
+    {
+        if(listener != null) listener.onNetworkFailure();
+    }
+
+    @Override
+    public void sendData(String data, NetBridge.DataReliability reliability)    //TODO: move this inside NetBridge?
+    {
+        netBridge.sendData(data, reliability);
+    }
 
     public void connectDialog(Activity activity)
     {
@@ -152,9 +167,9 @@ public class NetAdapter
         this.listener = null;
     }
 
-    private void failure()
+    public Sender getSender()
     {
-        if(listener != null) listener.onNetworkFailure();
+        return sender;
     }
 }
 
