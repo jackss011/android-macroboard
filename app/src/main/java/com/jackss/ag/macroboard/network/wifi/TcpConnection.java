@@ -1,4 +1,4 @@
-package com.jackss.ag.macroboard.network;
+package com.jackss.ag.macroboard.network.wifi;
 
 import android.os.*;
 import android.support.annotation.Nullable;

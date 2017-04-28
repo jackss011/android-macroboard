@@ -3,6 +3,7 @@ package com.jackss.ag.macroboard.network;
 import android.app.Activity;
 import android.support.annotation.NonNull;
 import android.util.Log;
+import com.jackss.ag.macroboard.network.wifi.WifiBridge;
 import com.jackss.ag.macroboard.ui.fragments.ConnectDialogFragment;
 
 import java.net.InetAddress;

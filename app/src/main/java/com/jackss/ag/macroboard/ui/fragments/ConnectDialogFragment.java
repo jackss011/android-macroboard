@@ -11,8 +11,8 @@ import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import com.jackss.ag.macroboard.R;
-import com.jackss.ag.macroboard.network.Beacon;
-import com.jackss.ag.macroboard.network.SocketInfo;
+import com.jackss.ag.macroboard.network.wifi.Beacon;
+import com.jackss.ag.macroboard.network.wifi.SocketInfo;
 import com.jackss.ag.macroboard.settings.StaticSettings;
 
 import java.util.Set;

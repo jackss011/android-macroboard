@@ -1,7 +1,8 @@
-package com.jackss.ag.macroboard.network;
+package com.jackss.ag.macroboard.network.wifi;
 
 import android.content.Context;
 import android.util.Log;
+import com.jackss.ag.macroboard.network.NetBridge;
 import com.jackss.ag.macroboard.settings.StaticSettings;
 
 import java.net.InetAddress;

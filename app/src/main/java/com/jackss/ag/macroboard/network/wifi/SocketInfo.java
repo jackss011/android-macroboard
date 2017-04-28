@@ -1,4 +1,4 @@
-package com.jackss.ag.macroboard.network;
+package com.jackss.ag.macroboard.network.wifi;
 
 import android.support.annotation.NonNull;
 import java.net.InetAddress;
