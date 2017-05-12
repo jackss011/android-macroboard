@@ -1,5 +1,6 @@
 package com.jackss.ag.macroboard.utils;
 
+import android.bluetooth.BluetoothAdapter;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.support.annotation.NonNull;
@@ -67,5 +68,11 @@ public class StaticLibrary
     {
         String res[] = hostName.split("\\.");
         return res.length > 0 ? res[0] : hostName;
+    }
+
+    /** Get a user friendly device name */
+    public static String getDeviceName()
+    {
+        return BluetoothAdapter.getDefaultAdapter().getName();
     }
 }
