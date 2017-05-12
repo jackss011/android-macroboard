@@ -4,6 +4,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
+import com.jackss.ag.macroboard.network.Packager;
 import com.jackss.ag.macroboard.settings.StaticSettings;
 import com.jackss.ag.macroboard.utils.ExpiringList;
 
@@ -74,8 +75,9 @@ public class Beacon
 
                 while(true)
                 {
-                    String test = "test"; // TODO: response here
-                    byte sending[] = test.getBytes(StandardCharsets.UTF_8);
+                    String request = Packager.packBroadcastMessage();
+
+                    byte sending[] = request.getBytes(StandardCharsets.UTF_8);
                     DatagramPacket packet = new DatagramPacket(sending, sending.length, group, StaticSettings.NET_PORT);
 
                     multicastSocket.send(packet);
@@ -143,16 +145,29 @@ public class Beacon
                 while(true)
                 {
                     byte buff[] = new byte[256];
-                    DatagramPacket request = new DatagramPacket(buff, buff.length);
-                    receiverSocket.receive(request);
+                    DatagramPacket responsePacket = new DatagramPacket(buff, buff.length);
+                    receiverSocket.receive(responsePacket);
 
-                    InetAddress requestAddress = request.getAddress();
-                    if(requestAddress != null) //TODO: check for response
+                    InetAddress requestAddress = responsePacket.getAddress();
+                    if(requestAddress != null)
                     {
-                        SocketInfo info = new SocketInfo(requestAddress.getHostAddress(), requestAddress.getHostName());
-                        mainHandler.obtainMessage(MSG_WHAT_ADDRESS, info).sendToTarget();
+                        String response = new String(
+                                responsePacket.getData(),
+                                responsePacket.getOffset(),
+                                responsePacket.getLength(),
+                                StandardCharsets.UTF_8 );
+
+                        if(Packager.validateBeaconResponse(response))
+                        {
+                            SocketInfo info = new SocketInfo(requestAddress.getHostAddress(), requestAddress.getHostName());
+                            mainHandler.obtainMessage(MSG_WHAT_ADDRESS, info).sendToTarget();
+                        }
+                        else
+                        {
+                            Log.d(TAG, "Invalid response: " + response);
+                        }
                     }
-                    else throw new AssertionError("Unexpected error");
+                    else throw new AssertionError("Unexpected error"); //TODO: bad throw
 
                     if(Thread.interrupted()) break;
                 }

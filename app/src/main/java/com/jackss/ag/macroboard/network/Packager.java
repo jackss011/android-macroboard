@@ -7,6 +7,10 @@ public class Packager
 {
     private static final String DIV = " ";
 
+    private static final String HD_REQUEST  = "MB_REQUEST";
+    private static final String HD_RESPONSE = "MB_RESPONSE";
+
+
     private static final String SL_ACTION   = "A";
     private static final String MD_COPY     = "c";
     private static final String MD_CUT      = "x";
@@ -16,6 +20,16 @@ public class Packager
     private static final String MD_CLICK_1  = "1";
     private static final String MD_CLICK_2  = "2";
 
+
+    public static String packBroadcastMessage()
+    {
+        return HD_REQUEST;
+    }
+
+    public static boolean validateBeaconResponse(String response)
+    {
+        return response.equals(HD_RESPONSE);
+    }
 
     public static String packActionCopy()
     {
