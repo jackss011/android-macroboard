@@ -3,8 +3,10 @@ package com.jackss.ag.macroboard.network.wifi;
 import android.content.Context;
 import android.util.Log;
 import com.jackss.ag.macroboard.network.NetBridge;
+import com.jackss.ag.macroboard.network.Packager;
 import com.jackss.ag.macroboard.settings.StaticSettings;
 
+import java.io.PrintWriter;
 import java.net.InetAddress;
 
 
@@ -19,12 +21,31 @@ public class WifiBridge extends NetBridge<InetAddress>
 
     private UdpSender udpSender;
 
+    private boolean handShakeComplete = false;
+
+
     private TcpConnection.OnTcpListener tcpListener= new TcpConnection.OnTcpListener()
     {
         @Override
         public void onData(String data)
         {
             Log.v(TAG, "Data received: " + data);
+
+            if(isHandShakeComplete())
+            {
+                Log.v(TAG, "Valid data");   //TODO: manage data here
+            }
+            else
+            {
+                if(Packager.unpackHandShake(data))
+                {
+                    Log.i(TAG, "Valid handshake");
+                    handShakeComplete = true;
+                    setConnectionState(BridgeState.CONNECTED);
+                }
+                else
+                    Log.i(TAG, "Invalid handshake");
+            }
         }
 
         @Override
@@ -35,12 +56,15 @@ public class WifiBridge extends NetBridge<InetAddress>
                 case IDLE:
                     setConnectionState(BridgeState.IDLE);
                     break;
+
                 case CONNECTING:
                     setConnectionState(BridgeState.CONNECTING);
                     break;
+
                 case CONNECTED:
-                    setConnectionState(BridgeState.CONNECTED);
+                    sendHandShake();
                     break;
+
                 case ERROR:
                     setConnectionState(BridgeState.ERROR);
                     break;
@@ -75,6 +99,7 @@ public class WifiBridge extends NetBridge<InetAddress>
     public void stopConnection()
     {
         tcpConnection.reset();
+        invalidateHandShake();
     }
 
     @Override
@@ -104,5 +129,21 @@ public class WifiBridge extends NetBridge<InetAddress>
         }
 
         return true;
+    }
+
+    private void sendHandShake()
+    {
+        if(getConnectionState() == BridgeState.CONNECTING)
+            tcpConnection.sendData(Packager.packHandShake());
+    }
+
+    private boolean isHandShakeComplete()
+    {
+        return handShakeComplete;
+    }
+
+    private void invalidateHandShake()
+    {
+        handShakeComplete = false;
     }
 }

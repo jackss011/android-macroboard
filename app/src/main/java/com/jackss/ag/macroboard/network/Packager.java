@@ -1,15 +1,20 @@
 package com.jackss.ag.macroboard.network;
 
+import com.jackss.ag.macroboard.utils.StaticLibrary;
+
 /**
  *
  */
 public class Packager
 {
-    private static final String DIV = " ";
+    private static final String DIV = ";";
+    private static final String SPEC = ":";
 
-    private static final String HD_REQUEST  = "MB_REQUEST";
-    private static final String HD_RESPONSE = "MB_RESPONSE";
+    private static final String HS_HEADER = "MB_HANDSHAKE";
+    private static final String HS_NAME = "N";
 
+    private static final String BE_REQUEST = "MB_REQUEST";
+    private static final String BE_RESPONSE = "MB_RESPONSE";
 
     private static final String SL_ACTION   = "A";
     private static final String MD_COPY     = "c";
@@ -21,15 +26,39 @@ public class Packager
     private static final String MD_CLICK_2  = "2";
 
 
+// |==============================
+// |==>  HANDSHAKE
+// |===============================
+
+    public static String packHandShake()
+    {
+        return HS_HEADER + DIV + HS_NAME + SPEC + StaticLibrary.getDeviceName();
+    }
+
+    public static boolean unpackHandShake(String handshake)
+    {
+        return handshake.equals(HS_HEADER);
+    }
+
+
+// |==============================
+// |==>  BEACON
+// |===============================
+
     public static String packBroadcastMessage()
     {
-        return HD_REQUEST;
+        return BE_REQUEST;
     }
 
     public static boolean validateBeaconResponse(String response)
     {
-        return response.equals(HD_RESPONSE);
+        return response.equals(BE_RESPONSE);
     }
+
+
+// |==============================
+// |==>  ACTIONS
+// |===============================
 
     public static String packActionCopy()
     {
@@ -44,5 +73,15 @@ public class Packager
     public static String packActionPaste()
     {
         return SL_ACTION + DIV + MD_PASTE;
+    }
+
+    private static String div(String... k)
+    {
+        String f = "";
+
+        for(String item : k)
+            f += item + DIV;
+
+        return f;
     }
 }
