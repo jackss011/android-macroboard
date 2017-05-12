@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <Button
+        android:id="@+id/sandbox_start"
+        android:onClick="onClick"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Start"
+        android:layout_marginStart="10dp"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="11dp" />
+
+    <Button
+        android:id="@+id/sandbox_stop"
+        android:onClick="onClick"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Stop"
+
+        android:layout_toEndOf="@id/sandbox_start"
+        android:layout_alignTop="@id/sandbox_start" />
+
+    <Button
+        android:id="@+id/sandbox_send"
+        android:onClick="onClick"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Send"
+        android:layout_alignTop="@id/sandbox_start"
+        android:layout_toEndOf="@id/sandbox_stop" />
+
+    <TextView
+        android:id="@+id/sandbox_result"
+        android:onClick="onClick"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/sandbox_start"
+        android:text="Result"
+        android:layout_marginTop="12dp"
+        android:layout_marginStart="24dp"/>
+
+</RelativeLayout>

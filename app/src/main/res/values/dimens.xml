@@ -2,8 +2,9 @@
 
     <dimen name="activity_horizontal_margin">14dp</dimen>
     <dimen name="activity_vertical_margin">14dp</dimen>
-
     <dimen name="trackpad_padding">4dp</dimen>
     <dimen name="divider_size">1dp</dimen>
+    <dimen name="connect_spinner_size">32dp</dimen>
+    <dimen name="icon_label_space">24dp</dimen>
 
 </resources>

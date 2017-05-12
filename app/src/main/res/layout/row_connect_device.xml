@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="56dp"
+    android:orientation="horizontal"
+    android:paddingStart="16dp"
+    android:paddingEnd="16dp">
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:contentDescription="@string/icon_content_description"
+        android:src="@drawable/ic_computer_black_24dp"
+        android:tint="@color/colorIcons"
+        android:layout_gravity="center_vertical"/>
+
+    <Space
+        android:layout_width="@dimen/icon_label_space"
+        android:layout_height="match_parent" />
+
+    <TextView
+        android:id="@+id/connect_device_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/bni_dummy_text"
+        android:layout_gravity="center_vertical"
+        android:textSize="16sp"
+        android:textColor="#474747"/>
+
+</LinearLayout>

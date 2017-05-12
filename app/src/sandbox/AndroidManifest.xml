@@ -1,0 +1,21 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <application>
+
+        <activity android:name="com.jackss.ag.macroboard.sandbox.NetworkTestsActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!--Prevent double app icon-->
+        <activity android:name="com.jackss.ag.macroboard.ui.activities.MainActivity">
+            <intent-filter tools:node="removeAll">
+            </intent-filter>
+        </activity>
+
+    </application>
+
+</manifest>

@@ -1,14 +1,18 @@
 package com.jackss.ag.macroboard.utils;
 
+import android.bluetooth.BluetoothAdapter;
 import android.content.res.Resources;
 import android.graphics.Color;
+import android.support.annotation.NonNull;
 import android.util.DisplayMetrics;
 import android.view.View;
+import java.util.concurrent.ThreadFactory;
+
 
 /**
  *  Static library for generic methods
  */
-public class MBUtils
+public class StaticLibrary
 {
     /** Convert dp to px */
     public static int dp2px(float dp)
@@ -42,5 +46,33 @@ public class MBUtils
         hsv[2] = hsv[2] * amount;
 
         return Color.HSVToColor(hsv);
+    }
+
+    /** Create a thread factory for network threads */
+    public static ThreadFactory buildNetworkThreadFactory()
+    {
+        return new ThreadFactory()
+        {
+            @Override
+            public Thread newThread(@NonNull Runnable r)
+            {
+                Thread t = new Thread(r);
+                t.setDaemon(true);
+                return t;
+            }
+        };
+    }
+
+    /** Remove every char after the first dot. Prevent wifi modems to modify socket names. */
+    public static String sanitizeHostName(String hostName)
+    {
+        String res[] = hostName.split("\\.");
+        return res.length > 0 ? res[0] : hostName;
+    }
+
+    /** Get a user friendly device name */
+    public static String getDeviceName()
+    {
+        return BluetoothAdapter.getDefaultAdapter().getName();
     }
 }

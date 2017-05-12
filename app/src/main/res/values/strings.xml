@@ -2,7 +2,11 @@
 
     <string name="app_name">MacroBoard</string>
 
-    <string name="bni_dummy_text">DummyText</string>
+    <string name="bni_dummy_text">Dummy Text</string>
     <string name="custom_category_empty">No custom buttons</string>
+    <string name="scanning_for_devices">Scanning for devices…</string>
+    <string name="icon_content_description">PC</string>
+    <string name="cancel">Cancel</string>
+    <string name="connect_to_device">Connect to device</string>
 
 </resources>
